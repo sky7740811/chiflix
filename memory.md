@@ -31,5 +31,7 @@
 
 ## Config Applied
 - AGENTS.md strict mode: ask before editing files
-- CHANGELOG.csv: log all file changes
-- French comments in code
+- AGENTS.md weight rule: repeated requests = dig deeper
+- AGENTS.md versioning rule: git commit before major changes
+- CHANGELOG.csv: log all file changes in French
+- Git repo initialized at D:\Chiflix2
