@@ -10,7 +10,7 @@
   --text-muted: #999;
   --text-dim: #777;
   --border: #222;
-  --font: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  --font: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -43,6 +43,7 @@ body {
 .navbar.scrolled { background: var(--bg); }
 .navbar-logo {
   font-size: 28px; font-weight: 900; color: var(--accent);
+  font-family: 'Montserrat', 'Netflix Sans', 'Helvetica Neue', Arial, sans-serif;
   letter-spacing: -1px; margin-right: 40px; cursor: pointer;
   user-select: none;
 }
@@ -50,11 +51,11 @@ body {
 .navbar-links { display: flex; gap: 20px; }
 .navbar-link {
   color: var(--text-secondary); text-decoration: none;
-  font-size: 14px; font-weight: 500; cursor: pointer;
+  font-size: 14px; font-weight: 400; cursor: pointer;
   background: none; border: none; padding: 0;
   transition: color .2s;
 }
-.navbar-link:hover, .navbar-link.active { color: var(--text); font-weight: 600; }
+.navbar-link:hover, .navbar-link.active { color: var(--text); font-weight: 500; }
 .navbar-right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
 .navbar-search {
   background: transparent; border: 1px solid rgba(255,255,255,.3);
