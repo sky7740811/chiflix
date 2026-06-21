@@ -20,8 +20,6 @@ echo   Frontend: http://localhost:3000
 echo   Backend:  http://localhost:8000
 echo ========================================
 echo.
-echo Waiting for frontend to be ready...
-timeout /T 8 /NOBREAK >nul
 start http://localhost:3000
 echo.
 echo Press any key to stop all servers...
