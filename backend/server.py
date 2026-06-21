@@ -41,6 +41,7 @@ class ProgressUpdate(BaseModel):
     time_ms: int
     episode_href: Optional[str] = None
     img_src: Optional[str] = None
+    total_ms: Optional[int] = None
 
 class WatchlistAdd(BaseModel):
     anime_title: str
@@ -139,7 +140,7 @@ def get_progress(anime_title: str, ep_num: int):
 @app.post("/api/progress")
 def save_progress(req: ProgressUpdate):
     try:
-        pm.update_timeline(req.anime_title, req.ep_num, req.time_ms)
+        pm.update_timeline(req.anime_title, req.ep_num, req.time_ms, total_duration=req.total_ms)
         if req.episode_href:
             import utils.progress_manager as pm2
             wc = pm2.load_web_cache()
@@ -148,6 +149,20 @@ def save_progress(req: ProgressUpdate):
             ehrefs[str(req.ep_num)] = req.episode_href
             cfg["img_src"] = req.img_src
             pm2.save_web_cache(wc)
+        return {"status": "ok"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/progress/delete")
+def delete_progress(anime_title: str, ep_num: int):
+    try:
+        data = pm.load_progress()
+        if anime_title in data.get("watchlist", {}):
+            eps = data["watchlist"][anime_title].get("episodes", {})
+            if str(ep_num) in eps:
+                del eps[str(ep_num)]
+                data["watchlist"][anime_title]["episodes"] = eps
+                pm.save_progress(data)
         return {"status": "ok"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -116,7 +116,7 @@ def get_anime_cache(anime_title):
     data = load_web_cache()
     return data.get("anime_configs", {}).get(anime_title)
 
-def update_timeline(anime_title, ep_num, time_ms):
+def update_timeline(anime_title, ep_num, time_ms, total_duration=None):
     data = load_progress()
     if "watchlist" not in data:
         data["watchlist"] = {}
@@ -131,8 +131,11 @@ def update_timeline(anime_title, ep_num, time_ms):
     data["watchlist"][anime_title]["last_watched_episode"] = ep_num
     if "episodes" not in data["watchlist"][anime_title]:
         data["watchlist"][anime_title]["episodes"] = {}
-        
-    data["watchlist"][anime_title]["episodes"][str(ep_num)] = {"time_ms": time_ms}
+    
+    entry = {"time_ms": time_ms}
+    if total_duration:
+        entry["total_ms"] = total_duration
+    data["watchlist"][anime_title]["episodes"][str(ep_num)] = entry
     save_progress(data)
 
 def get_timeline(anime_title, ep_num):

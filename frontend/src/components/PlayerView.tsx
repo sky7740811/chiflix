@@ -168,7 +168,7 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
     const iv = setInterval(async () => {
       const t = timeRef.current;
       if (t <= 0) return;
-      try { await api.saveProgress(animeTitle, currentEpNum, Math.round(t), hrefRef.current || undefined, imgSrc || undefined); } catch {}
+      try { await api.saveProgress(animeTitle, currentEpNum, Math.round(t), hrefRef.current || undefined, imgSrc || undefined, duration > 0 ? duration : undefined); } catch {}
     }, 1000);
     return () => clearInterval(iv);
   }, [playing, animeTitle, currentEpNum]);

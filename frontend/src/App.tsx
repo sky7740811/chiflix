@@ -89,7 +89,7 @@ export default function App() {
   const renderView = () => {
     switch (currentView) {
       case 'home':
-        return <HomeView />;
+        return <HomeView onPlayLocal={handlePlayLocal} />;
       case 'search':
         return <SearchView onPlayEpisode={handlePlayEpisode} />;
       case 'player':

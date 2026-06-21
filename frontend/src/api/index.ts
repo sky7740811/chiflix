@@ -61,10 +61,10 @@ export async function getProgress(animeTitle: string, epNum: number): Promise<nu
   return data.time_ms;
 }
 
-export async function saveProgress(animeTitle: string, epNum: number, timeMs: number, episodeHref?: string, imgSrc?: string): Promise<void> {
+export async function saveProgress(animeTitle: string, epNum: number, timeMs: number, episodeHref?: string, imgSrc?: string, totalMs?: number): Promise<void> {
   await fetchJSON('/progress', {
     method: 'POST',
-    body: JSON.stringify({ anime_title: animeTitle, ep_num: epNum, time_ms: Math.round(timeMs), episode_href: episodeHref || null, img_src: imgSrc || null }),
+    body: JSON.stringify({ anime_title: animeTitle, ep_num: epNum, time_ms: Math.round(timeMs), episode_href: episodeHref || null, img_src: imgSrc || null, total_ms: totalMs || null }),
   });
 }
 

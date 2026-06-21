@@ -14,7 +14,7 @@ export interface EpisodeItem {
 export interface WatchlistItem {
   last_watched_episode: number;
   img_src: string | null;
-  episodes: Record<string, { time_ms: number }>;
+  episodes: Record<string, { time_ms: number; total_ms?: number }>;
 }
 
 export interface LocalFile {

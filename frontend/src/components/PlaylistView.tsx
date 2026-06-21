@@ -86,18 +86,22 @@ export default function PlaylistView({ onPlayLocal }: PlaylistViewProps) {
             {selWl && watchlist[selWl] ? (
               Object.entries(watchlist[selWl].episodes || {}).sort(([a],[b]) => parseInt(a)-parseInt(b)).map(([ep, data]) => {
                 const s = Math.floor((data.time_ms || 0) / 1000);
+                const pct = data.total_ms ? Math.min(100, (data.time_ms / data.total_ms) * 100) : 0;
                 return (
-                  <div key={ep} className="progress-item" onClick={() => onPlayLocal(selWl, parseInt(ep))}>
-                    <div className="progress-thumb" style={{ background: '#2a2a3e', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>▶</div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 600, fontSize: '14px' }}>Episode {ep}</div>
-                      <div style={{ color: '#888', fontSize: '12px', marginTop: '2px' }}>Resume at {Math.floor(s/60)}:{String(s%60).padStart(2,'0')}</div>
-                      <div className="progress-bar"><div className="progress-fill" style={{ width: `${Math.min(100, (data.time_ms||0)/60000)}%` }} /></div>
+                  <div key={ep} className="progress-item" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '16px', cursor: 'pointer', minWidth: 0 }} onClick={() => onPlayLocal(selWl, parseInt(ep))}>
+                      <div className="progress-thumb" style={{ background: '#2a2a3e', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>▶</div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, fontSize: '14px' }}>Episode {ep}</div>
+                        <div style={{ color: '#888', fontSize: '12px', marginTop: '2px' }}>Resume at {Math.floor(s/60)}:{String(s%60).padStart(2,'0')}</div>
+                        {pct > 0 && <div className="progress-bar"><div className="progress-fill" style={{ width: `${pct}%` }} /></div>}
+                      </div>
                     </div>
-                  </div>
-                );
-              })
-            ) : (
+                    <button onClick={async (e) => { e.stopPropagation(); if (!confirm(`Delete progress for Episode ${ep}?`)) return; try { await fetch(`/api/progress/delete?anime_title=${encodeURIComponent(selWl)}&ep_num=${ep}`, { method: 'POST' }); refresh(); } catch { alert('Failed'); } }} title="Delete" style={{ background: 'none', border: 'none', cursor: 'pointer', opacity: .35, padding: '4px', transition: 'opacity .15s', flexShrink: 0, color: '#fff', fontSize: '14px' }} onMouseEnter={(e) => e.currentTarget.style.opacity = '1'} onMouseLeave={(e) => e.currentTarget.style.opacity = '.35'}>✕</button>
+                    </div>
+                  );
+                })
+              ) : (
               <div className="progress-item" style={{ cursor: 'default', opacity: .5 }}>
                 <div className="progress-thumb" style={{ background: '#2a2a3e', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px' }}>⊡</div>
                 <div style={{ flex: 1 }}>
