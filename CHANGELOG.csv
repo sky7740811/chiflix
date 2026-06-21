@@ -8,6 +8,7 @@
 2026-06-18,Script de démarrage combiné,start.bat
 2026-06-20,Versionnage Git init + .gitignore,/
 2026-06-20,AGENTS.md: poids + versionnage règles ajoutées,AGENTS.md
+2026-06-21,start.bat: ouverture automatique du navigateur,start.bat
 2026-06-18,Redesign Netflix-style: navbar, hero, rows, player, mylist,frontend/src/
 2026-06-18,Composant HomeView avec hero billboard et rows de contenu,frontend/src/components/HomeView.tsx
 2026-06-18,Suppression Sidebar au profit de la top navbar,frontend/src/App.tsx
