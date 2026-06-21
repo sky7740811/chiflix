@@ -21,6 +21,7 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
   const skipAccumRef = useRef(0);
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
+  const playingRef = useRef(false);
   const [volume, setVolume] = useState(() => { try { return parseInt(localStorage.getItem('chiflix_vol') || '70', 10); } catch { return 70; } });
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -48,8 +49,8 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
   const bumpControls = useCallback(() => {
     setShowControls(true);
     if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-    if (playing) hideTimerRef.current = setTimeout(() => setShowControls(false), 3000);
-  }, [playing]);
+    if (playingRef.current) hideTimerRef.current = setTimeout(() => setShowControls(false), 3000);
+  }, []);
 
   useEffect(() => {
     return () => { if (hideTimerRef.current) clearTimeout(hideTimerRef.current); };
@@ -175,10 +176,28 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
     return () => clearInterval(iv);
   }, [playing, animeTitle, currentEpNum]);
 
+  /* Save on pause */
+  const doSaveProgress = useCallback(async () => {
+    const t = timeRef.current;
+    if (t <= 0 || !animeTitle || !currentEpNum) return;
+    try { await api.saveProgress(animeTitle, currentEpNum, Math.round(t), hrefRef.current || undefined, imgSrc || undefined, duration > 0 ? duration : undefined); } catch {}
+  }, [animeTitle, currentEpNum, imgSrc, duration]);
+
+  useEffect(() => {
+    if (!playing && timeRef.current > 0 && animeTitle && currentEpNum) {
+      doSaveProgress();
+    }
+  }, [playing, doSaveProgress, animeTitle, currentEpNum]);
+
+  /* Save on unmount */
+  useEffect(() => {
+    return () => { doSaveProgress(); };
+  }, [doSaveProgress]);
+
   const togglePlay = useCallback(() => {
     if (!videoRef.current) return;
-    if (videoRef.current.paused) { videoRef.current.play().catch(() => {}); setPlaying(true); }
-    else { videoRef.current.pause(); setPlaying(false); }
+    if (videoRef.current.paused) { videoRef.current.play().catch(() => {}); setPlaying(true); playingRef.current = true; }
+    else { videoRef.current.pause(); setPlaying(false); playingRef.current = false; }
     bumpControls();
   }, [bumpControls]);
 
@@ -232,7 +251,7 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
   const currentEpIdx = episodes.findIndex((e) => e.ep_num === currentEpNum);
 
   const goToEpisode = useCallback((targetEp: number, targetHref: string) => {
-    setPlaying(false);
+    setPlaying(false); playingRef.current = false;
     setCurrentTime(0);
     setDuration(0);
     setShowEpList(false);
