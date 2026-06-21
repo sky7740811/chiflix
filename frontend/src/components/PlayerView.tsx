@@ -39,7 +39,7 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
   const [isDownloaded, setIsDownloaded] = useState(false);
   const [imgSrc, setImgSrc] = useState<string | null>(null);
   const [volPopup, setVolPopup] = useState<number | null>(null);
-  const [skipPopup, setSkipPopup] = useState<string | null>(null);
+  const [skipPopup, setSkipPopup] = useState<{ sec: number; side: 'left' | 'right' } | null>(null);
   const volPopupTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const skipPopupTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -214,8 +214,8 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
     if (skipAccumRef.current === 0) skipBaseRef.current = videoRef.current.currentTime;
     skipAccumRef.current += sec;
     videoRef.current.currentTime = Math.max(0, Math.min(skipBaseRef.current + skipAccumRef.current, dur));
-    const label = sec > 0 ? `+${sec}s` : `${sec}s`;
-    setSkipPopup(label);
+    const side = sec < 0 ? 'left' : 'right';
+    setSkipPopup({ sec, side });
     if (skipPopupTimer.current) clearTimeout(skipPopupTimer.current);
     skipPopupTimer.current = setTimeout(() => { setSkipPopup(null); skipAccumRef.current = 0; }, 1200);
     bumpControls();
@@ -332,26 +332,28 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
   );
 
   const SRewind10 = () => (
-    <svg viewBox="0 0 28 28" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="14" cy="13" r="9" strokeDasharray="14 16" />
-      <polyline points="16 5 14 3 12 5" />
-      <text x="14" y="18" fontSize="11" fill="#fff" stroke="none" textAnchor="middle" fontWeight="800" fontFamily="Arial,sans-serif">10</text>
+    <svg viewBox="0 0 24 24" width="32" height="32" fill="#fff">
+      <path fillRule="evenodd" d="M11.02 2.05A10 10 0 1 1 2 12H0a12 12 0 1 0 5-9.75V1H3v4a1 1 0 0 0 1 1h4V4H6a10 10 0 0 1 5.02-1.95M2 4v3h3v2H1a1 1 0 0 1-1-1V4zm12.13 12q-.88 0-1.53-.42-.64-.44-1-1.22a5 5 0 0 1-.35-1.86q0-1.05.35-1.85.36-.79 1-1.22A2.7 2.7 0 0 1 14.13 9a2.65 2.65 0 0 1 2.52 1.65q.35.79.35 1.85 0 1.07-.35 1.86a3 3 0 0 1-1.01 1.22 2.7 2.7 0 0 1-1.52.42m0-1.35q.59 0 .91-.56.34-.56.34-1.59 0-1.01-.34-1.58-.33-.57-.91-.57-.6 0-.92.57-.34.56-.34 1.58t.34 1.6q.33.54.91.55m-5.53 1.2v-5.13l-1.6.42V9.82l3.2-.8v6.84z"/>
     </svg>
   );
 
   const SForward10 = () => (
-    <svg viewBox="0 0 28 28" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="14" cy="13" r="9" strokeDasharray="14 16" strokeDashoffset="7" />
-      <polyline points="12 5 14 3 16 5" />
-      <text x="14" y="18" fontSize="11" fill="#fff" stroke="none" textAnchor="middle" fontWeight="800" fontFamily="Arial,sans-serif">10</text>
+    <svg viewBox="0 0 24 24" width="32" height="32" fill="#fff">
+      <path fillRule="evenodd" d="M6.44 3.69A10 10 0 0 1 18 4h-2v2h4a1 1 0 0 0 1-1V1h-2v1.25A12 12 0 1 0 24 12h-2A10 10 0 1 1 6.44 3.69M22 4v3h-3v2h4a1 1 0 0 0 1-1V4zm-9.4 11.58q.66.42 1.53.42a2.7 2.7 0 0 0 1.5-.42q.67-.44 1.02-1.22.35-.8.35-1.86 0-1.05-.35-1.85A2.65 2.65 0 0 0 14.13 9a2.7 2.7 0 0 0-1.53.43q-.64.44-1 1.22a4.5 4.5 0 0 0-.35 1.85q0 1.07.35 1.86.36.78 1 1.22m2.44-1.49q-.33.56-.91.56-.6 0-.92-.56-.34-.56-.34-1.59 0-1.01.34-1.58.33-.57.91-.57.6 0 .92.57.34.56.34 1.58t-.34 1.6M8.6 10.72v5.14h1.6V9.02l-3.2.8v1.32z"/>
     </svg>
   );
 
   const SForward30 = () => (
-    <svg viewBox="0 0 28 28" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="14" cy="13" r="9" strokeDasharray="14 16" strokeDashoffset="7" />
-      <polyline points="12 5 14 3 16 5" />
-      <text x="14" y="18" fontSize="11" fill="#fff" stroke="none" textAnchor="middle" fontWeight="800" fontFamily="Arial,sans-serif">30</text>
+    <svg viewBox="0 0 24 24" width="32" height="32" fill="#fff">
+      <path fillRule="evenodd" d="M6.44 3.69A10 10 0 0 1 18 4h-2v2h4a1 1 0 0 0 1-1V1h-2v1.25A12 12 0 1 0 24 12h-2A10 10 0 1 1 6.44 3.69M22 4v3h-3v2h4a1 1 0 0 0 1-1V4z"/>
+      <text x="13" y="16" fontSize="9" fill="#fff" textAnchor="middle" fontWeight="700" fontFamily="Arial,sans-serif">30</text>
+    </svg>
+  );
+
+  const SForward90 = () => (
+    <svg viewBox="0 0 24 24" width="32" height="32" fill="#e50914">
+      <path fillRule="evenodd" d="M6.44 3.69A10 10 0 0 1 18 4h-2v2h4a1 1 0 0 0 1-1V1h-2v1.25A12 12 0 1 0 24 12h-2A10 10 0 1 1 6.44 3.69M22 4v3h-3v2h4a1 1 0 0 0 1-1V4z"/>
+      <text x="13" y="16" fontSize="9" fill="#e50914" textAnchor="middle" fontWeight="800" fontFamily="Arial,sans-serif">90</text>
     </svg>
   );
 
@@ -459,10 +461,22 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
           </div>
         )}
 
-        {/* Skip popup */}
+        {/* Skip popup — icon overlay on left or right */}
         {skipPopup !== null && (
-          <div className="vol-popup" style={{ top: '140px' }}>
-            <span className="vol-popup-text" style={{ fontSize: '28px' }}>{skipPopup}</span>
+          <div style={{
+            position: 'absolute',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            left: skipPopup.side === 'left' ? '40px' : 'auto',
+            right: skipPopup.side === 'right' ? '40px' : 'auto',
+            zIndex: 10,
+            pointerEvents: 'none',
+            filter: 'drop-shadow(0 0 12px rgba(0,0,0,.6))',
+          }}>
+            {Math.abs(skipPopup.sec) === 90 ? <SForward90 /> :
+             Math.abs(skipPopup.sec) === 30 ? <SForward30 /> :
+             Math.abs(skipPopup.sec) === 10 && skipPopup.side === 'right' ? <SForward10 /> :
+             <SRewind10 />}
           </div>
         )}
 
@@ -526,6 +540,7 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
               <button className="nf-btn" onClick={() => skip(-10)} title="-10s"><SRewind10 /></button>
               <button className="nf-btn" onClick={() => skip(10)} title="+10s"><SForward10 /></button>
               <button className="nf-btn" onClick={() => skip(30)} title="+30s"><SForward30 /></button>
+              <button className="nf-btn" onClick={() => skip(90)} title="+90s"><SForward90 /></button>
               <div className="nf-vol-wrap"
                 onMouseEnter={() => setVolHover(true)}
                 onMouseLeave={() => setVolHover(false)}
