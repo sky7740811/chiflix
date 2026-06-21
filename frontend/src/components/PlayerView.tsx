@@ -17,6 +17,8 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const timeRef = useRef(0);
   const hrefRef = useRef('');
+  const skipBaseRef = useRef(0);
+  const skipAccumRef = useRef(0);
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(() => { try { return parseInt(localStorage.getItem('chiflix_vol') || '70', 10); } catch { return 70; } });
@@ -209,11 +211,13 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
   const skip = useCallback((sec: number) => {
     if (!videoRef.current) return;
     const dur = videoRef.current.duration || 0;
-    videoRef.current.currentTime = Math.max(0, Math.min(videoRef.current.currentTime + sec, dur));
+    if (skipAccumRef.current === 0) skipBaseRef.current = videoRef.current.currentTime;
+    skipAccumRef.current += sec;
+    videoRef.current.currentTime = Math.max(0, Math.min(skipBaseRef.current + skipAccumRef.current, dur));
     const label = sec > 0 ? `+${sec}s` : `${sec}s`;
     setSkipPopup(label);
     if (skipPopupTimer.current) clearTimeout(skipPopupTimer.current);
-    skipPopupTimer.current = setTimeout(() => setSkipPopup(null), 1200);
+    skipPopupTimer.current = setTimeout(() => { setSkipPopup(null); skipAccumRef.current = 0; }, 1200);
     bumpControls();
   }, [bumpControls]);
 
