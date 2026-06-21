@@ -31,7 +31,7 @@ const NAV_ITEMS = [
   { path: '/', label: '홈' },
   { path: '/search', label: '검색' },
   { path: '/player', label: '플레이어' },
-  { path: '/mylist', label: 'My List' },
+  { path: '/mylist', label: '내 리스트' },
 ];
 
 export default function App() {
@@ -123,7 +123,7 @@ export default function App() {
         <div className="navbar-right">
           <input
             className={`navbar-search${navSearchOpen ? ' open' : ''}`}
-            placeholder="Search anime..."
+            placeholder="애니메이션 검색..."
             value={navSearchVal}
             onChange={(e) => setNavSearchVal(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleNavSearch()}
@@ -140,13 +140,13 @@ export default function App() {
           <Route path="/player" element={
             playContext
               ? <PlayerView key={`${playContext.animeTitle}-${playContext.epNum}`} animeTitle={playContext.animeTitle} epNum={playContext.epNum} episodeHref={playContext.episodeHref} filePath={playContext.filePath} onClear={handleClearPlayer} onNavigate={handleNavigateEpisode} />
-              : <div className="player-view-content"><div className="empty-state">No anime selected.</div></div>
+              : <div className="player-view-content"><div className="empty-state">선택된 애니메이션이 없습니다</div></div>
           } />
           <Route path="/mylist" element={<PlaylistView onPlayLocal={handlePlayLocal} />} />
         </Routes>
         {currentPath !== '/player' && (
           <div className="footer">
-            <p>Chiflix v2 · React + FastAPI</p>
+            <p></p>
           </div>
         )}
       </div>

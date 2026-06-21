@@ -61,18 +61,18 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
     let dead = false;
     (async () => {
       try {
-        addLog(`Loading Ep ${epNum}...`);
+        addLog(`화 로딩 중...${epNum}...`);
 
         // 1) Direct file path
         if (filePath) {
-          addLog('Local file path provided');
+          addLog('로컬 파일 경로 제공됨');
           if (!dead) { setStreamUrl(`/api/local-file?path=${encodeURIComponent(filePath)}`); setIsDownloaded(true); return; }
         }
 
         // 2) Search local file
         const localPath = await api.findLocalFile(animeTitle, epNum);
         if (localPath) {
-          addLog('Local file found');
+          addLog('로컬 파일 발견');
           setIsDownloaded(true);
           if (!dead) setStreamUrl(`/api/local-file?path=${encodeURIComponent(localPath)}`);
           return;
@@ -97,15 +97,15 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
         }
 
         if (!href) {
-          if (!dead) addLog('No episode URL available');
+          if (!dead) addLog('에피소드 URL이 없습니다');
           return;
         }
-        addLog('Fetching stream link...');
+        addLog('스트림 링크 가져오는 중...');
         const link = await api.getStreamLink(href);
-        if (!dead && link) { setStreamUrl(link); addLog('Stream link acquired'); }
-        else if (!dead) addLog('ERROR: Stream link not found');
+        if (!dead && link) { setStreamUrl(link); addLog('스트림 링크 획득'); }
+        else if (!dead) addLog('오류: 스트림 링크를 찾을 수 없음');
       } catch (err: unknown) {
-        if (!dead) addLog(`ERROR: ${err instanceof Error ? err.message : ''}`);
+        if (!dead) addLog(`오류: ${err instanceof Error ? err.message : ''}`);
       }
     })();
     return () => { dead = true; };
@@ -241,16 +241,16 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
     setStreamUrl(null);
     if (onNavigate) onNavigate(animeTitle, targetEp, targetHref);
     (async () => {
-      addLog(`Switching to Ep ${targetEp}...`);
+      addLog(`화로 전환 중...${targetEp}...`);
       const localPath = await api.findLocalFile(animeTitle, targetEp);
       if (localPath) {
-        addLog('Local file found');
+        addLog('로컬 파일 발견');
         setStreamUrl(`/api/local-file?path=${encodeURIComponent(localPath)}`);
         return;
       }
       const link = await api.getStreamLink(targetHref);
-      if (link) { setStreamUrl(link); addLog('Stream link acquired'); }
-      else addLog('ERROR: Stream link not found');
+      if (link) { setStreamUrl(link); addLog('스트림 링크 획득'); }
+      else addLog('오류: 스트림 링크를 찾을 수 없음');
     })();
   }, [animeTitle, addLog]);
 
@@ -287,13 +287,13 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
 
   const handleFavorite = useCallback(async () => {
     setFavorited(true);
-    try { await api.addToWatchlist(animeTitle); addLog('Added to My List'); }
-    catch { setFavorited(false); addLog('ERROR: Failed to add'); }
+    try { await api.addToWatchlist(animeTitle); addLog('찜한 목록에 추가됨'); }
+    catch { setFavorited(false); addLog('오류: 추가 실패'); }
   }, [animeTitle, addLog]);
 
   const handleDownload = useCallback(async () => {
     if (!episodeHref) return;
-    setDownloading(true); setDlProgress(null); addLog('Starting download...');
+    setDownloading(true); setDlProgress(null); addLog('다운로드 시작 중...');
     try {
       const taskId = await api.downloadEpisodeDirect(episodeHref, animeTitle, epNum);
       const poll = setInterval(async () => {
@@ -301,11 +301,11 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
         setDlProgress(prog);
         if (prog.status === 'completed' || prog.status === 'error') {
           clearInterval(poll);
-          addLog(prog.status === 'completed' ? 'Done!' : `Failed: ${prog.error || ''}`);
+          addLog(prog.status === 'completed' ? '완료!' : `실패: ${prog.error || ''}`);
           setDownloading(false);
         }
       }, 1000);
-    } catch { addLog('ERROR: Download failed'); setDownloading(false); }
+    } catch { addLog('오류: 다운로드 실패'); setDownloading(false); }
   }, [episodeHref, animeTitle, epNum, addLog]);
 
   const fmt = (ms: number) => {
@@ -437,7 +437,7 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
   const volIcon = muted || volume === 0 ? <SVolMuted /> : <SVolHigh />;
 
   if (!animeTitle) {
-    return <div className="player-view-content"><div className="empty-state">No anime selected.</div></div>;
+    return <div className="player-view-content"><div className="empty-state">선택된 애니메이션이 없습니다</div></div>;
   }
 
   return (
@@ -488,7 +488,7 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
 
         {/* Top: back arrow */}
         <div className="nf-top">
-          <button className="nf-btn nf-btn-top" onClick={onClear} title="Back"><SBackArrow /></button>
+          <button className="nf-btn nf-btn-top" onClick={onClear} title="뒤로"><SBackArrow /></button>
         </div>
 
         {/* Center play */}
@@ -540,10 +540,10 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
               <button className="nf-btn" onClick={togglePlay} title={playing ? 'Pause' : 'Play'}>
                 {playing ? <SPause /> : <SPlay />}
               </button>
-              <button className="nf-btn" onClick={() => skip(-10)} title="-10s"><SRewind10 /></button>
-              <button className="nf-btn" onClick={() => skip(10)} title="+10s"><SForward10 /></button>
-              <button className="nf-btn" onClick={() => skip(30)} title="+30s"><SForward30 /></button>
-              <button className="nf-btn" onClick={() => skip(90)} title="+90s"><SForward90 /></button>
+              <button className="nf-btn" onClick={() => skip(-10)} title="10초 뒤로"><SRewind10 /></button>
+              <button className="nf-btn" onClick={() => skip(10)} title="10초 앞으로"><SForward10 /></button>
+              <button className="nf-btn" onClick={() => skip(30)} title="30초 앞으로"><SForward30 /></button>
+              <button className="nf-btn" onClick={() => skip(90)} title="90초 앞으로"><SForward90 /></button>
               <div className="nf-vol-wrap"
                 onMouseEnter={() => setVolHover(true)}
                 onMouseLeave={() => setVolHover(false)}
@@ -568,17 +568,17 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
 
             <div className="nf-ctrl-right">
               <button className="nf-btn" onClick={prevEpisode} disabled={currentEpIdx <= 0}
-                title="Previous Episode" style={currentEpIdx <= 0 ? { opacity: .3 } : {}}>
+                title="이전 에피소드" style={currentEpIdx <= 0 ? { opacity: .3 } : {}}>
                 <SPrevEp />
               </button>
               <button className="nf-btn" onClick={nextEpisode} disabled={currentEpIdx >= episodes.length - 1}
-                title="Next Episode" style={currentEpIdx >= episodes.length - 1 ? { opacity: .3 } : {}}>
+                title="다음 에피소드" style={currentEpIdx >= episodes.length - 1 ? { opacity: .3 } : {}}>
                 <SNextEp />
               </button>
-              <button className="nf-btn" title="Picture in Picture"><SPip /></button>
-              <button className="nf-btn" title="Subtitles"><SSubtitles /></button>
-              <button className="nf-btn" title="Playback Speed"><SSpeed /></button>
-              <button className="nf-btn" onClick={() => setShowEpList((p) => !p)} title="Episode List">
+              <button className="nf-btn" title="PIP 모드"><SPip /></button>
+              <button className="nf-btn" title="자막"><SSubtitles /></button>
+              <button className="nf-btn" title="재생 속도"><SSpeed /></button>
+              <button className="nf-btn" onClick={() => setShowEpList((p) => !p)} title="에피소드 목록">
                 <SEpList />
               </button>
               <button className="nf-btn" onClick={toggleFullscreen} title={isFullscreen ? 'Exit' : 'Fullscreen'}>
@@ -590,14 +590,14 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
       </div>
 
       <div style={{ padding: '8px 60px', display: 'flex', gap: '8px', alignItems: 'center' }}>
-        <button className="btn-secondary" style={{ padding: '6px 16px', fontSize: '13px' }} onClick={onClear}>← Back</button>
+        <button className="btn-secondary" style={{ padding: '6px 16px', fontSize: '13px' }} onClick={onClear}>← 뒤로</button>
         {favorited
-          ? <span className="match">★ My List</span>
-          : <button className="btn-secondary" style={{ padding: '6px 16px', fontSize: '13px' }} onClick={handleFavorite}>+ My List</button>
+          ? <span className="match">★ 찜한 목록</span>
+          : <button className="btn-secondary" style={{ padding: '6px 16px', fontSize: '13px' }} onClick={handleFavorite}>+ 찜하기</button>
         }
-        <button className="btn-secondary" style={{ padding: '6px 16px', fontSize: '13px', background: isDownloaded ? '#333' : '#e50914', color: '#fff' }}
+        <button className="btn-secondary" style={{ padding: '6px 16px', fontSize: '13px', background: isDownloaded ? '✓ 다운로드 완료' : '다운로드', color: '#fff' }}
           onClick={handleDownload} disabled={downloading || isDownloaded}>
-          {downloading ? '...' : isDownloaded ? '✓ Downloaded' : 'Download'}
+          {downloading ? '...' : isDownloaded ? '✓ 다운로드 완료' : '다운로드'}
         </button>
         {dlProgress && (
           <span style={{ fontSize: '12px', color: '#e50914', fontWeight: 600, minWidth: '40px', textAlign: 'right' }}>

@@ -31,10 +31,10 @@ export default function HomeView({ onPlayLocal }: HomeViewProps) {
   if (!latest) {
     return (
       <div className="empty-state">
-        <div style={{ fontSize: '18px', marginBottom: '12px' }}>Welcome to Chiflix</div>
+        <div style={{ fontSize: '18px', marginBottom: '12px' }}>Chiflix에 오신 것을 환영합니다</div>
         <p style={{ color: '#888', lineHeight: 1.6 }}>
-          Search anime in the navbar above, or go to the <strong>Search</strong> tab.<br />
-          Click an episode to start watching.
+          상단 내비게이션에서 검색하거나 <strong>검색</strong> 탭을 이용하세요.<br />
+          에피소드를 클릭하여 시청을 시작하세요.
         </p>
       </div>
     );
@@ -45,7 +45,7 @@ export default function HomeView({ onPlayLocal }: HomeViewProps) {
 
   return (
     <div style={{ padding: '30px 60px' }}>
-      <h1 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '24px' }}>Continue Watching</h1>
+      <h1 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '24px' }}>계속 시청하기</h1>
       <div className="progress-item" onClick={() => onPlayLocal(latest.title, latest.ep)}
         style={{ cursor: 'pointer', background: '#1f1f1f', borderRadius: '8px', padding: '16px', maxWidth: '500px' }}>
         <div className="progress-thumb" style={{ background: '#2a2a3e', width: '100px', height: '60px', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>

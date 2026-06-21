@@ -43,7 +43,7 @@ export default function SearchView({ initialQuery = '', onPlayEpisode }: SearchV
       setQuery(navQ);
       handleSearch(navQ);
     } else if (results.length > 0 && !initialQuery) {
-      setStatus(`Loaded ${results.length} results from cache`);
+      setStatus(`캐시에서 ${results.length}개 불러옴`);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -53,7 +53,7 @@ export default function SearchView({ initialQuery = '', onPlayEpisode }: SearchV
     setSearching(true);
     setSelectedSeries(null);
     setEpisodes([]);
-    setStatus('Searching...');
+    setStatus('검색 중...');
     try {
       const data = await api.searchAnime(searchQ);
       const sorted = [...data].sort((a, b) => {
@@ -62,9 +62,9 @@ export default function SearchView({ initialQuery = '', onPlayEpisode }: SearchV
       });
       setResults(sorted);
       saveCache(searchQ, sorted);
-      setStatus(data.length ? `Found ${data.length} results` : 'No results found');
+      setStatus(data.length ? `${data.length}개 결과 발견` : '검색 결과가 없습니다');
     } catch (err: unknown) {
-      setStatus(`Error: ${err instanceof Error ? err.message : 'Search failed'}`);
+      setStatus(`Error: ${err instanceof Error ? err.message : '검색 실패'}`);
     } finally {
       setSearching(false);
     }
@@ -77,7 +77,7 @@ export default function SearchView({ initialQuery = '', onPlayEpisode }: SearchV
       try {
         const eps = await api.getEpisodes(item.href);
         setEpisodes(eps);
-        setStatus(`Loaded ${eps.length} episodes`);
+        setStatus(`${eps.length}개 에피소드 불러옴`);
         try {
           await fetch(`/api/anime-cache?anime_title=${encodeURIComponent(item.text)}&series_url=${encodeURIComponent(item.href)}`, { method: 'POST' });
           if (item.img_src) {
@@ -86,7 +86,7 @@ export default function SearchView({ initialQuery = '', onPlayEpisode }: SearchV
         } catch {}
       } catch (err: unknown) {
       setEpisodes([]);
-      setStatus(`Error: ${err instanceof Error ? err.message : 'Failed'}`);
+      setStatus(`Error: ${err instanceof Error ? err.message : '실패'}`);
     } finally {
       setLoadingEps(false);
     }
@@ -99,12 +99,12 @@ export default function SearchView({ initialQuery = '', onPlayEpisode }: SearchV
   return (
     <>
       <div className="search-header">
-        <h1>Search</h1>
+        <h1>검색</h1>
         <div className="search-input-wrap">
           <span style={{ color: '#999', marginRight: '12px', fontSize: '18px' }}>🔍</span>
           <input
             type="text"
-            placeholder="Anime title, genre, or keyword..."
+            placeholder="제목, 장르 또는 키워드 입력..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -133,7 +133,7 @@ export default function SearchView({ initialQuery = '', onPlayEpisode }: SearchV
       {!selectedSeries && results.length === 0 && !searching && (
         <div className="view-grid">
           <div className="view-grid-empty">
-            {status || 'Search for anime above'}
+            {status || '위에서 검색해보세요'}
           </div>
         </div>
       )}
@@ -141,27 +141,27 @@ export default function SearchView({ initialQuery = '', onPlayEpisode }: SearchV
       {selectedSeries && (
         <div style={{ padding: '0 60px 40px' }}>
           <div className="tab-bar" style={{ padding: '16px 0', marginBottom: '16px' }}>
-            <button className="tab-item" onClick={() => setSelectedSeries(null)}>← Back to results</button>
+            <button className="tab-item" onClick={() => setSelectedSeries(null)}>← 결과로 돌아가기</button>
             <button className="tab-item active">{selectedSeries.text}</button>
           </div>
           {loadingEps && <div className="empty-state" style={{ padding: '20px' }}>Loading episodes...</div>}
           {!loadingEps && episodes.length === 0 && (
-            <div className="empty-state" style={{ padding: '20px' }}>No episodes found</div>
+            <div className="empty-state" style={{ padding: '20px' }}>에피소드가 없습니다</div>
           )}
           {episodes.map((ep, i) => (
             <div key={i} className="episode-item" onClick={() => handleEpisodeClick(ep)}>
-              <div className="episode-thumb"><span>Ep {ep.ep_num}</span></div>
+              <div className="episode-thumb"><span>{ep.ep_num}화</span></div>
               <div className="episode-info">
                 <div className="episode-title">{ep.text}</div>
-                <div className="episode-meta">Episode {ep.ep_num}</div>
-                <div className="episode-desc">Click to watch</div>
+                <div className="episode-meta">{ep.ep_num}화</div>
+                <div className="episode-desc">클릭하여 시청</div>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      <div className="status-text">{searching ? 'Searching...' : status}</div>
+      <div className="status-text">{searching ? '검색 중...' : status}</div>
     </>
   );
 }

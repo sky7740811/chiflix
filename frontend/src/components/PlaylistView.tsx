@@ -27,8 +27,8 @@ export default function PlaylistView({ onPlayLocal }: PlaylistViewProps) {
   }, [selDir, dirs]);
 
   const deleteFile = useCallback(async (f: LocalFile) => {
-    if (!confirm(`Delete "${f.filename}"?`)) return;
-    try { await api.deleteLocalFile(f.path); await refresh(); } catch { alert('Delete failed'); }
+    if (!confirm(`"${f.filename}" 파일을 삭제하시겠습니까?`)) return;
+    try { await api.deleteLocalFile(f.path); await refresh(); } catch { alert('삭제 실패'); }
   }, [refresh]);
 
   const wlItems = Object.entries(watchlist);
@@ -37,24 +37,24 @@ export default function PlaylistView({ onPlayLocal }: PlaylistViewProps) {
   return (
     <div style={{ paddingBottom: '40px' }}>
       <div className="mylist-header">
-        <h1>My List</h1>
-        <p>Your personal anime collection & progress</p>
+        <h1>내 리스트</h1>
+        <p>당신의 애니메이션 컬렉션 및 진행 상황</p>
         <div className="tab-switch">
-          <button className={tab === 'watchlist' ? 'active' : ''} onClick={() => setTab('watchlist')}>Watchlist</button>
-          <button className={tab === 'downloads' ? 'active' : ''} onClick={() => { setTab('downloads'); if (!selDir && dlItems.length > 0) setSelDir(dlItems[0][0]); }}>Downloads</button>
+          <button className={tab === 'watchlist' ? 'active' : ''} onClick={() => setTab('watchlist')}>찜 목록</button>
+          <button className={tab === 'downloads' ? 'active' : ''} onClick={() => { setTab('downloads'); if (!selDir && dlItems.length > 0) setSelDir(dlItems[0][0]); }}>다운로드</button>
         </div>
       </div>
 
       {tab === 'watchlist' && (
         <div className="mylist-layout">
           <div className="mylist-sidebar">
-            <div className="list-section-label">Tracked Shows</div>
+            <div className="list-section-label">시청 중인 작품</div>
             {wlItems.length === 0 && (
               <div className="list-card" style={{ cursor: 'default', opacity: .5 }}>
                 <div className="list-card-thumb" style={{ background: '#2a2a3e', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>♡</div>
                 <div className="list-card-info">
-                  <div className="list-card-title" style={{ fontWeight: 400 }}>No shows yet</div>
-                  <div className="list-card-sub">Favorite a show from Player</div>
+                  <div className="list-card-title" style={{ fontWeight: 400 }}>아직 없음</div>
+                  <div className="list-card-sub">플레이어에서 찜하기</div>
                 </div>
               </div>
             )}
@@ -66,13 +66,13 @@ export default function PlaylistView({ onPlayLocal }: PlaylistViewProps) {
                   <div className="list-card-thumb" style={{ background: ['#2a2a3e','#1a1a2e','#2e1a2e','#1a2e1a'][i%4], display: 'flex', alignItems: 'center', justifyContent: 'center' }}>♡</div>
                   <div className="list-card-info">
                     <div className="list-card-title">{title}</div>
-                    <div className="list-card-sub">{data.last_watched_episode > 0 ? `Ep ${data.last_watched_episode}` : 'Not started'}</div>
+                    <div className="list-card-sub">{data.last_watched_episode > 0 ? `Ep ${data.last_watched_episode}` : '시작 전'}</div>
                   </div>
                 </div>
                 <button onClick={async () => {
                   if (!confirm(`Remove "${title}" from watchlist?`)) return;
                   try { await api.removeFromWatchlist(title); refresh(); if (selWl === title) setSelWl(null); } catch { alert('Failed'); }
-                }} title="Remove" style={{
+                }} title="삭제" style={{
                   background: 'none', border: 'none', cursor: 'pointer', opacity: .35, padding: '4px',
                   transition: 'opacity .15s', flexShrink: 0, color: '#fff', fontSize: '16px',
                 }} onMouseEnter={(e) => e.currentTarget.style.opacity = '1'} onMouseLeave={(e) => e.currentTarget.style.opacity = '.35'}>
@@ -82,7 +82,7 @@ export default function PlaylistView({ onPlayLocal }: PlaylistViewProps) {
             ))}
           </div>
           <div className="mylist-main">
-            <div className="list-section-label">Progress Records</div>
+            <div className="list-section-label">시청 기록</div>
             {selWl && watchlist[selWl] ? (
               Object.entries(watchlist[selWl].episodes || {}).sort(([a],[b]) => parseInt(a)-parseInt(b)).map(([ep, data]) => {
                 const s = Math.floor((data.time_ms || 0) / 1000);
@@ -97,7 +97,7 @@ export default function PlaylistView({ onPlayLocal }: PlaylistViewProps) {
                         {pct > 0 && <div className="progress-bar"><div className="progress-fill" style={{ width: `${pct}%` }} /></div>}
                       </div>
                     </div>
-                    <button onClick={async (e) => { e.stopPropagation(); if (!confirm(`Delete progress for Episode ${ep}?`)) return; try { await fetch(`/api/progress/delete?anime_title=${encodeURIComponent(selWl)}&ep_num=${ep}`, { method: 'POST' }); refresh(); } catch { alert('Failed'); } }} title="Delete" style={{ background: 'none', border: 'none', cursor: 'pointer', opacity: .35, padding: '4px', transition: 'opacity .15s', flexShrink: 0, color: '#fff', fontSize: '14px' }} onMouseEnter={(e) => e.currentTarget.style.opacity = '1'} onMouseLeave={(e) => e.currentTarget.style.opacity = '.35'}>✕</button>
+                    <button onClick={async (e) => { e.stopPropagation(); if (!confirm(`시청 기록을 삭제${ep}?`)) return; try { await fetch(`/api/progress/delete?anime_title=${encodeURIComponent(selWl)}&ep_num=${ep}`, { method: 'POST' }); refresh(); } catch { alert('Failed'); } }} title="삭제" style={{ background: 'none', border: 'none', cursor: 'pointer', opacity: .35, padding: '4px', transition: 'opacity .15s', flexShrink: 0, color: '#fff', fontSize: '14px' }} onMouseEnter={(e) => e.currentTarget.style.opacity = '1'} onMouseLeave={(e) => e.currentTarget.style.opacity = '.35'}>✕</button>
                     </div>
                   );
                 })
@@ -105,7 +105,7 @@ export default function PlaylistView({ onPlayLocal }: PlaylistViewProps) {
               <div className="progress-item" style={{ cursor: 'default', opacity: .5 }}>
                 <div className="progress-thumb" style={{ background: '#2a2a3e', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px' }}>⊡</div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 400, fontSize: '14px', color: '#888' }}>{wlItems.length > 0 ? 'Select a show' : 'No records'}</div>
+                  <div style={{ fontWeight: 400, fontSize: '14px', color: '#888' }}>{wlItems.length > 0 ? '시리즈 선택' : '기록 없음'}</div>
                 </div>
               </div>
             )}
@@ -116,13 +116,13 @@ export default function PlaylistView({ onPlayLocal }: PlaylistViewProps) {
       {tab === 'downloads' && (
         <div className="mylist-layout">
           <div className="mylist-sidebar">
-            <div className="list-section-label">Anime Shows</div>
+            <div className="list-section-label">작품 목록</div>
             {dlItems.length === 0 && (
               <div className="list-card" style={{ cursor: 'default', opacity: .5 }}>
                 <div className="list-card-thumb" style={{ background: '#2a2a3e', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>📁</div>
                 <div className="list-card-info">
-                  <div className="list-card-title" style={{ fontWeight: 400 }}>No downloads</div>
-                  <div className="list-card-sub">Download from Player</div>
+                  <div className="list-card-title" style={{ fontWeight: 400 }}>다운로드 없음</div>
+                  <div className="list-card-sub">플레이어에서 다운로드</div>
                 </div>
               </div>
             )}
@@ -136,12 +136,12 @@ export default function PlaylistView({ onPlayLocal }: PlaylistViewProps) {
             ))}
           </div>
           <div style={{ flex: 1 }}>
-            <div className="list-section-label">Episodes</div>
+            <div className="list-section-label">에피소드</div>
             {selFiles.length === 0 && (
               <div className="progress-item" style={{ cursor: 'default', opacity: .5 }}>
                 <div className="progress-thumb" style={{ background: '#2a2a3e', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px' }}>⊡</div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 400, fontSize: '14px', color: '#888' }}>{dlItems.length > 0 ? 'Select a show' : 'No files'}</div>
+                  <div style={{ fontWeight: 400, fontSize: '14px', color: '#888' }}>{dlItems.length > 0 ? '시리즈 선택' : '파일 없음'}</div>
                 </div>
               </div>
             )}
@@ -150,9 +150,9 @@ export default function PlaylistView({ onPlayLocal }: PlaylistViewProps) {
                 <div className="progress-thumb" style={{ background: '#2a2a3e', width: '50px', minHeight: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>📁</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontWeight: 600, fontSize: '14px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{f.filename.replace('.mp4', '')}</div>
-                  <div style={{ color: '#888', fontSize: '12px' }}>Local file</div>
+                  <div style={{ color: '#888', fontSize: '12px' }}>로컬 파일</div>
                 </div>
-                <button onClick={() => deleteFile(f)} title="Delete" style={{
+                <button onClick={() => deleteFile(f)} title="삭제" style={{
                   background: 'none', border: 'none', cursor: 'pointer', opacity: .4, padding: '6px', flexShrink: 0,
                   transition: 'opacity .15s', borderRadius: '4px',
                 }} onMouseEnter={(e) => e.currentTarget.style.opacity = '1'} onMouseLeave={(e) => e.currentTarget.style.opacity = '.4'}>
@@ -171,7 +171,7 @@ export default function PlaylistView({ onPlayLocal }: PlaylistViewProps) {
 
       <div className="status-text">
         <button className="section-link" style={{ color: '#e50914', fontSize: '13px', background: 'none', border: 'none', cursor: 'pointer' }} onClick={refresh}>
-          ↻ Refresh
+          ↻ 새로고침
         </button>
       </div>
     </div>
