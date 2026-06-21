@@ -1,7 +1,7 @@
 @echo off
-title Chiflix Stream Pro v2
+title Chiflix v2
 echo ========================================
-echo   Chiflix Stream Pro v2 - Starting...
+echo   Chiflix v2 - Starting...
 echo ========================================
 echo.
 

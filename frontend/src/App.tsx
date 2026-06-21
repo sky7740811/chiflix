@@ -105,7 +105,7 @@ export default function App() {
     <>
       <nav className={`navbar${scrolled ? ' scrolled' : ''}`}>
         <div className="navbar-logo" onClick={() => setCurrentView('home')}>
-          CHIFLIX<span>Pro</span>
+          CHIFLIX
         </div>
         <div className="navbar-links">
           {NAV_ITEMS.map((item) => (
@@ -138,7 +138,7 @@ export default function App() {
         {renderView()}
         {currentView !== 'player' && (
           <div className="footer">
-            <p>Chiflix Stream Pro v2 · React + FastAPI</p>
+            <p>Chiflix v2 · React + FastAPI</p>
           </div>
         )}
       </div>
