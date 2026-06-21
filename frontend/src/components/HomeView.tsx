@@ -53,8 +53,8 @@ export default function HomeView({ onPlayLocal }: HomeViewProps) {
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontWeight: 700, fontSize: '16px' }}>{latest.title}</div>
-          <div style={{ color: '#999', fontSize: '13px', marginTop: '2px' }}>Episode {latest.ep}</div>
-          <div style={{ color: '#888', fontSize: '12px', marginTop: '2px' }}>Resume at {Math.floor(s/60)}:{String(s%60).padStart(2,'0')}</div>
+          <div style={{ color: '#999', fontSize: '13px', marginTop: '2px' }}>{latest.ep}화</div>
+          <div style={{ color: '#888', fontSize: '12px', marginTop: '2px' }}>{Math.floor(s/60)}분{String(s%60).padStart(2,'0')}초부터 보기</div>
           {pct > 0 && (
             <div className="progress-bar" style={{ marginTop: '8px' }}>
               <div className="progress-fill" style={{ width: `${pct}%` }} />

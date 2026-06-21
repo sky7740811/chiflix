@@ -66,7 +66,7 @@ export default function PlaylistView({ onPlayLocal }: PlaylistViewProps) {
                   <div className="list-card-thumb" style={{ background: ['#2a2a3e','#1a1a2e','#2e1a2e','#1a2e1a'][i%4], display: 'flex', alignItems: 'center', justifyContent: 'center' }}>♡</div>
                   <div className="list-card-info">
                     <div className="list-card-title">{title}</div>
-                    <div className="list-card-sub">{data.last_watched_episode > 0 ? `Ep ${data.last_watched_episode}` : '시작 전'}</div>
+                    <div className="list-card-sub">{data.last_watched_episode > 0 ? `화${data.last_watched_episode}` : '시작 전'}</div>
                   </div>
                 </div>
                 <button onClick={async () => {
@@ -92,8 +92,8 @@ export default function PlaylistView({ onPlayLocal }: PlaylistViewProps) {
                     <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '16px', cursor: 'pointer', minWidth: 0 }} onClick={() => onPlayLocal(selWl, parseInt(ep))}>
                       <div className="progress-thumb" style={{ background: '#2a2a3e', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>▶</div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontWeight: 600, fontSize: '14px' }}>Episode {ep}</div>
-                        <div style={{ color: '#888', fontSize: '12px', marginTop: '2px' }}>Resume at {Math.floor(s/60)}:{String(s%60).padStart(2,'0')}</div>
+                        <div style={{ fontWeight: 600, fontSize: '14px' }}>{ep}화</div>
+                        <div style={{ color: '#888', fontSize: '12px', marginTop: '2px' }}>{Math.floor(s/60)}분{String(s%60).padStart(2,'0')}초부터 보기</div>
                         {pct > 0 && <div className="progress-bar"><div className="progress-fill" style={{ width: `${pct}%` }} /></div>}
                       </div>
                     </div>
