@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chiflix - Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', 'Helvetica Neue', sans-serif;
+    background: #141414;
+    color: #fff;
+    overflow-x: hidden;
+  }
+
+  /* ── Top Nav (Netflix-style) ── */
+  .navbar {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 68px;
+    background: linear-gradient(180deg, rgba(0,0,0,.85) 0%, transparent 100%);
+    display: flex; align-items: center;
+    padding: 0 60px;
+    z-index: 100;
+    transition: background .3s;
+  }
+  .navbar.scrolled { background: #141414; }
+  .nav-logo {
+    font-size: 28px; font-weight: 900;
+    color: #e50914;
+    letter-spacing: -1px;
+    margin-right: 40px;
+    cursor: pointer;
+  }
+  .nav-logo span { font-weight: 300; color: #fff; }
+  .nav-links { display: flex; gap: 20px; }
+  .nav-links a {
+    color: #e5e5e5; text-decoration: none;
+    font-size: 14px; font-weight: 500;
+    transition: color .2s;
+    cursor: pointer;
+  }
+  .nav-links a:hover, .nav-links a.active { color: #fff; font-weight: 600; }
+  .nav-right { margin-left: auto; display: flex; align-items: center; gap: 20px; }
+  .nav-search {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 4px;
+    padding: 6px 14px;
+    color: #fff; font-size: 14px;
+    width: 0; opacity: 0;
+    transition: width .3s, opacity .3s, border-color .3s;
+  }
+  .nav-search.open { width: 240px; opacity: 1; }
+  .nav-search:focus { border-color: #fff; outline: none; }
+  .nav-search-btn {
+    background: none; border: none; color: #fff; font-size: 20px;
+    cursor: pointer;
+  }
+
+  /* ── Main Content ── */
+  .main { padding-top: 68px; }
+
+  /* ── Hero Billboard ── */
+  .hero {
+    height: 80vh;
+    min-height: 500px;
+    max-height: 800px;
+    position: relative;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    overflow: hidden;
+    display: flex; align-items: flex-end;
+    padding: 0 60px 100px;
+  }
+  .hero::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 200px;
+    background: linear-gradient(180deg, transparent 0%, #141414 100%);
+  }
+  .hero-bg {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at 30% 50%, rgba(229,9,20,.15) 0%, transparent 60%);
+  }
+  .hero-content { position: relative; z-index: 2; max-width: 600px; }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(229,9,20,.9);
+    padding: 3px 12px;
+    border-radius: 3px;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+  }
+  .hero-title { font-size: clamp(32px, 5vw, 64px); font-weight: 900; line-height: 1.1; margin-bottom: 16px; }
+  .hero-meta { font-size: 16px; color: #999; margin-bottom: 16px; }
+  .hero-meta span { color: #fff; }
+  .hero-desc {
+    font-size: 15px; color: #bbb; line-height: 1.5;
+    margin-bottom: 24px; max-width: 500px;
+  }
+  .hero-buttons { display: flex; gap: 12px; }
+  .btn-play {
+    background: #fff; color: #000; border: none;
+    padding: 10px 32px; border-radius: 4px;
+    font-size: 16px; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; gap: 10px;
+    transition: opacity .2s;
+  }
+  .btn-play:hover { opacity: .85; }
+  .btn-info {
+    background: rgba(109,109,110,.7); color: #fff; border: none;
+    padding: 10px 28px; border-radius: 4px;
+    font-size: 16px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; gap: 10px;
+    transition: background .2s;
+  }
+  .btn-info:hover { background: rgba(109,109,110,.4); }
+
+  /* ── Rows ── */
+  .section { padding: 0 60px 30px; position: relative; z-index: 2; }
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-size: 22px; font-weight: 700;
+    letter-spacing: -.3px;
+  }
+  .section-link {
+    color: #bbb; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: color .2s;
+  }
+  .section-link:hover { color: #fff; }
+
+  .row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; scroll-behavior: smooth; }
+  .row::-webkit-scrollbar { height: 6px; }
+  .row::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+  .row::-webkit-scrollbar-track { background: transparent; }
+
+  .card {
+    flex: 0 0 auto;
+    width: 180px;
+    border-radius: 4px;
+    overflow: hidden;
+    transition: transform .3s, box-shadow .3s;
+    cursor: pointer;
+    position: relative;
+  }
+  .card:hover {
+    transform: scale(1.05);
+    z-index: 10;
+  }
+  .card-img {
+    width: 100%; aspect-ratio: 2/3;
+    background: linear-gradient(135deg, #2a2a3e, #1a1a2e);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 40px; color: #333;
+  }
+  .card-footer {
+    padding: 8px 4px;
+    font-size: 13px; font-weight: 500;
+    color: #ddd;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .card-badge {
+    position: absolute; top: 8px; left: 0;
+    background: #e50914;
+    font-size: 10px; font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 0 3px 3px 0;
+  }
+  .card-rank {
+    position: absolute; bottom: 30px; left: 4px;
+    font-size: 60px; font-weight: 900;
+    color: rgba(255,255,255,.3);
+    line-height: 1;
+    text-shadow: 2px 2px 8px rgba(0,0,0,.6);
+  }
+
+  /* ── Player Section ── */
+  .player-section {
+    padding: 0 60px 40px;
+  }
+  .player-container {
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+    aspect-ratio: 16/9;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .player-overlay {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px;
+    background: rgba(0,0,0,.3);
+    cursor: pointer;
+  }
+  .player-overlay:hover { background: rgba(0,0,0,.2); }
+  .play-icon {
+    width: 80px; height: 80px;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px; padding-left: 6px;
+    transition: transform .2s, background .2s;
+  }
+  .player-overlay:hover .play-icon { transform: scale(1.1); background: rgba(229,9,14,.8); border-color: #e50914; }
+  .player-controls {
+    display: flex; align-items: center; gap: 16px;
+    padding: 12px 16px;
+    background: #181818;
+  }
+  .player-timeline {
+    flex: 1; height: 4px; background: #333; border-radius: 2px;
+    cursor: pointer; position: relative;
+  }
+  .player-timeline-fill { height: 100%; width: 35%; background: #e50914; border-radius: 2px; }
+  .player-time { font-size: 12px; color: #999; font-variant-numeric: tabular-nums; }
+  .ctrl-btn { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; opacity: .7; transition: opacity .2s; }
+  .ctrl-btn:hover { opacity: 1; }
+  .ctrl-btn.volume { font-size: 18px; }
+
+  /* ── Tab (Browse / My List) ── */
+  .tab-bar {
+    display: flex; gap: 24px;
+    padding: 20px 60px 0;
+    border-bottom: 1px solid #222;
+    margin-bottom: 24px;
+  }
+  .tab-item {
+    font-size: 15px; font-weight: 500; color: #888;
+    padding-bottom: 14px; cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color .2s, border-color .2s;
+  }
+  .tab-item.active { color: #fff; border-bottom-color: #e50914; }
+  .tab-item:hover { color: #bbb; }
+
+  /* ── Episode List ── */
+  .episode-list { margin-top: 16px; }
+  .episode-item {
+    display: flex; gap: 16px; padding: 12px 0;
+    border-bottom: 1px solid #222;
+    cursor: pointer; transition: background .2s;
+    border-radius: 4px; padding: 12px;
+  }
+  .episode-item:hover { background: #1f1f1f; }
+  .episode-thumb {
+    width: 140px; min-height: 80px;
+    background: linear-gradient(135deg, #2a2a3e, #1a1a2e);
+    border-radius: 4px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: #444; font-size: 12px;
+  }
+  .episode-info { flex: 1; }
+  .episode-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .episode-meta { font-size: 12px; color: #777; margin-bottom: 6px; }
+  .episode-desc { font-size: 13px; color: #999; line-height: 1.4; }
+
+  /* ── My List ── */
+  .mylist-layout { display: flex; gap: 30px; padding: 0 60px 40px; }
+  .mylist-sidebar { width: 280px; flex-shrink: 0; }
+  .mylist-main { flex: 1; }
+  .list-card {
+    display: flex; gap: 12px; padding: 10px;
+    border-radius: 6px; cursor: pointer;
+    transition: background .2s;
+    align-items: center;
+  }
+  .list-card:hover { background: #1f1f1f; }
+  .list-card.active { background: rgba(229,9,20,.2); }
+  .list-card-thumb {
+    width: 45px; height: 65px;
+    background: linear-gradient(135deg, #2a2a3e, #1a1a2e);
+    border-radius: 4px; flex-shrink: 0;
+  }
+  .list-card-info { flex: 1; min-width: 0; }
+  .list-card-title { font-size: 14px; font-weight: 600; }
+  .list-card-sub { font-size: 12px; color: #777; margin-top: 2px; }
+
+  .progress-item {
+    display: flex; gap: 16px; padding: 14px 12px;
+    border-bottom: 1px solid #222; cursor: pointer;
+    transition: background .2s; border-radius: 4px;
+  }
+  .progress-item:hover { background: #1f1f1f; }
+  .progress-thumb {
+    width: 120px; min-height: 68px;
+    background: linear-gradient(135deg, #2a2a3e, #1a1a2e);
+    border-radius: 4px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; color: #444; font-size: 11px;
+  }
+  .progress-bar {
+    width: 100%; height: 3px; background: #333; border-radius: 2px; margin-top: 8px;
+  }
+  .progress-fill { height: 100%; width: 60%; background: #e50914; border-radius: 2px; }
+
+  /* ── Search Results ── */
+  .search-header { padding: 30px 60px 0; }
+  .search-header h1 { font-size: 28px; font-weight: 700; }
+  .search-input-wrapper {
+    margin-top: 16px;
+    background: #2a2a2a;
+    border-radius: 6px;
+    display: flex; align-items: center;
+    padding: 0 16px;
+    border: 1px solid #333;
+    transition: border-color .2s;
+  }
+  .search-input-wrapper:focus-within { border-color: #fff; }
+  .search-input-wrapper input {
+    flex: 1; background: none; border: none; color: #fff;
+    font-size: 16px; padding: 14px 0; outline: none;
+  }
+  .search-input-wrapper input::placeholder { color: #666; }
+
+  .genre-chips { display: flex; gap: 10px; flex-wrap: wrap; padding: 20px 60px; }
+  .chip {
+    padding: 8px 16px; border-radius: 20px;
+    background: #2a2a2a; color: #ddd;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    transition: background .2s, color .2s;
+    border: none;
+  }
+  .chip:hover, .chip.active { background: #e50914; color: #fff; }
+
+  .search-grid { display: grid; grid-template-columns: repeat(auto-fill, 180px); gap: 12px; padding: 0 60px 40px; justify-content: center; }
+
+  @media (max-width: 768px) {
+    .navbar { padding: 0 20px; }
+    .hero { padding: 0 20px 80px; min-height: 400px; }
+    .section { padding: 0 20px 20px; }
+    .search-header { padding: 20px 20px 0; }
+    .search-grid { padding: 0 20px 30px; grid-template-columns: repeat(auto-fill, 140px); gap: 8px; }
+    .card { width: 140px; }
+    .mylist-layout { flex-direction: column; padding: 0 20px 30px; }
+    .mylist-sidebar { width: 100%; }
+    .episode-thumb { width: 100px; }
+    .player-section { padding: 0 20px 30px; }
+    .genre-chips { padding: 16px 20px; }
+    .tab-bar { padding: 16px 20px 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ Top Nav ═══ -->
+<nav class="navbar" id="navbar">
+  <div class="nav-logo">CHIFLIX<span>Pro</span></div>
+  <div class="nav-links">
+    <a class="active" onclick="switchView('browse')">Home</a>
+    <a onclick="switchView('player')">Player</a>
+    <a onclick="switchView('mylist')">My List</a>
+  </div>
+  <div class="nav-right">
+    <button class="nav-search-btn" onclick="toggleSearch()" id="searchToggle">🔍</button>
+    <input class="nav-search" id="navSearch" placeholder="Search anime..." onkeydown="if(event.key==='Enter')doSearch(this.value)">
+  </div>
+</nav>
+
+<!-- ═══ Views ═══ -->
+<div class="main">
+
+  <!-- ─── BROWSE VIEW ─── -->
+  <div id="view-browse">
+    <div class="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-content">
+        <div class="hero-badge">TRENDING NOW</div>
+        <h1 class="hero-title">One Piece</h1>
+        <div class="hero-meta"><span>2026</span> &nbsp;·&nbsp; TV Series &nbsp;·&nbsp; 7 Seasons &nbsp;·&nbsp; <span style="color:#46d369;">98% Match</span></div>
+        <p class="hero-desc">Follow Monkey D. Luffy and his pirate crew as they search for the ultimate treasure, the One Piece, in a grand adventure across the seas.</p>
+        <div class="hero-buttons">
+          <button class="btn-play">▶ Play</button>
+          <button class="btn-info">ℹ More Info</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" style="margin-top:-40px">
+      <div class="section-header">
+        <h2 class="section-title">Popular on Chiflix</h2>
+        <span class="section-link">See All ›</span>
+      </div>
+      <div class="row" id="popularRow"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">Continue Watching</h2>
+        <span class="section-link">See All ›</span>
+      </div>
+      <div class="row" id="continueRow"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">Romance</h2>
+        <span class="section-link">See All ›</span>
+      </div>
+      <div class="row" id="romanceRow"></div>
+    </div>
+
+    <div class="tab-bar">
+      <span class="tab-item active">All</span>
+      <span class="tab-item">Movies</span>
+      <span class="tab-item">TV Series</span>
+      <span class="tab-item">Recently Added</span>
+    </div>
+
+    <div class="search-grid" id="browseGrid"></div>
+  </div>
+
+  <!-- ─── SEARCH VIEW ─── -->
+  <div id="view-search" style="display:none">
+    <div class="search-header">
+      <h1>Search</h1>
+      <div class="search-input-wrapper">
+        <span style="color:#999;margin-right:12px;font-size:18px;">🔍</span>
+        <input type="text" placeholder="Anime title, genre, or keyword..." id="searchInput">
+      </div>
+    </div>
+    <div class="genre-chips">
+      <button class="chip active">All</button>
+      <button class="chip">Action</button>
+      <button class="chip">Romance</button>
+      <button class="chip">Comedy</button>
+      <button class="chip">Fantasy</button>
+      <button class="chip">Slice of Life</button>
+      <button class="chip">Thriller</button>
+      <button class="chip">Mecha</button>
+    </div>
+    <div class="search-grid" id="searchGrid"></div>
+  </div>
+
+  <!-- ─── PLAYER VIEW ─── -->
+  <div id="view-player" style="display:none">
+    <div class="player-section" style="padding-top:30px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div>
+          <h1 style="font-size:22px;font-weight:700">One Piece</h1>
+          <span style="color:#999;font-size:13px;">Season 1 · Episode 1: Romance Dawn</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <span style="color:#46d369;font-size:13px;font-weight:600">★ My List</span>
+          <button style="background:#e50914;border:none;color:#fff;padding:8px 20px;border-radius:4px;font-weight:600;cursor:pointer">Download</button>
+        </div>
+      </div>
+      <div class="player-container">
+        <div class="player-overlay">
+          <div class="play-icon">▶</div>
+          <span style="font-size:18px;font-weight:600;letter-spacing:1px">WATCH EPISODE</span>
+        </div>
+      </div>
+      <div class="player-controls">
+        <button class="ctrl-btn">⏮</button>
+        <button class="ctrl-btn">▶</button>
+        <button class="ctrl-btn">⏭</button>
+        <div style="flex:1;display:flex;align-items:center;gap:12px">
+          <span class="player-time">15:22</span>
+          <div class="player-timeline"><div class="player-timeline-fill"></div></div>
+          <span class="player-time">43:10</span>
+        </div>
+        <button class="ctrl-btn volume">🔊</button>
+        <input type="range" style="width:80px;accent-color:#e50914" value="70">
+        <button class="ctrl-btn">⛶</button>
+      </div>
+      <div style="margin-top:24px">
+        <div class="section-header">
+          <h2 class="section-title">Episodes</h2>
+          <span class="section-link" style="background:#e50914;padding:6px 18px;border-radius:4px;color:#fff;font-size:12px">Single Ep</span>
+        </div>
+        <div class="episode-list" id="episodeList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── MY LIST VIEW ─── -->
+  <div id="view-mylist" style="display:none">
+    <div class="section" style="padding-top:30px">
+      <h1 style="font-size:28px;font-weight:700;margin-bottom:8px">My List</h1>
+      <p style="color:#777;font-size:14px;margin-bottom:24px">Your personal anime collection & progress</p>
+      <div style="display:flex;gap:0;margin-bottom:0">
+        <button class="chip active" style="border-radius:4px 0 0 4px;border:none">Watchlist</button>
+        <button class="chip" style="border-radius:0 4px 4px 0;border:none;background:#2a2a2a">Downloads</button>
+      </div>
+    </div>
+    <div class="mylist-layout">
+      <div class="mylist-sidebar">
+        <div style="font-size:12px;color:#888;text-transform:uppercase;font-weight:600;letter-spacing:1px;margin-bottom:12px">Tracked Shows</div>
+        <div id="trackedList"></div>
+      </div>
+      <div class="mylist-main">
+        <div style="font-size:12px;color:#888;text-transform:uppercase;font-weight:600;letter-spacing:1px;margin-bottom:12px">Progress</div>
+        <div id="progressList"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══ Footer ═══ -->
+<div style="padding:40px 60px 60px;border-top:1px solid #222;margin-top:40px">
+  <div style="color:#888;font-size:13px;text-align:center">
+    Chiflix Stream Pro v2 · React + FastAPI · Netflix-inspired UI
+  </div>
+</div>
+
+<script>
+  // ── Sample Data ──
+  const animeTitles = [
+    'One Piece', 'Attack on Titan', 'Jujutsu Kaisen', 'Demon Slayer',
+    'Chainsaw Man', 'Solo Leveling', 'Spy x Family', 'Vinland Saga',
+    'My Hero Academia', 'Fullmetal Alchemist', 'Death Note', 'Hunter x Hunter'
+  ];
+  const genres = ['Action', 'Romance', 'Comedy', 'Fantasy', 'Thriller', 'Mecha', 'Slice of Life'];
+  const episodes = [
+    { title: 'Romance Dawn — The Dawn of Adventure', meta: '24 min', desc: 'Luffy sets sail to become the Pirate King and gathers his first crew members.' },
+    { title: 'The Great Pretender', meta: '24 min', desc: 'Our heroes encounter a mysterious new island with dark secrets.' },
+    { title: 'Storm Rising', meta: '24 min', desc: 'An unexpected enemy appears as the crew navigates treacherous waters.' },
+    { title: 'Bonds of Friendship', meta: '24 min', desc: 'The crew faces their greatest challenge yet, testing their loyalty.' },
+    { title: 'The Final Showdown', meta: '26 min', desc: 'Everything comes to a head in an epic battle for their dreams.' },
+  ];
+  const watchlist = [
+    { title: 'One Piece', sub: 'Last watched: Ep 15 · 68% complete', active: true },
+    { title: 'Attack on Titan', sub: 'Last watched: Ep 8 · 35% complete' },
+    { title: 'Solo Leveling', sub: 'Not started' },
+    { title: 'Jujutsu Kaisen', sub: 'Last watched: Ep 3 · 12% complete' },
+    { title: 'Demon Slayer', sub: 'Last watched: Ep 22 · 92% complete' },
+  ];
+  const progressItems = [
+    { title: 'Episode 15: Storm Rising', sub: 'Resume at 15:22 · 35%', pct: 35 },
+    { title: 'Episode 14: Bonds of Friendship', sub: 'Completed', pct: 100 },
+    { title: 'Episode 13: The Great Pretender', sub: 'Completed', pct: 100 },
+  ];
+
+  function makeCard(title, rank) {
+    const colors = ['#2a2a3e', '#1a1a2e', '#2e1a2e', '#1a2e1a', '#2e2a1a', '#1a2e2e'];
+    const bg = colors[Math.floor(Math.random() * colors.length)];
+    return `<div class="card">
+      ${rank ? `<div class="card-rank">${rank}</div>` : ''}
+      <div class="card-img" style="background:${bg};font-size:28px">🎬</div>
+      <div class="card-footer">${title}</div>
+    </div>`;
+  }
+
+  function populateRow(id, count, startRank) {
+    const el = document.getElementById(id);
+    el.innerHTML = animeTitles.slice(0, count).map((t, i) => makeCard(t, startRank ? startRank + i : null)).join('');
+  }
+
+  populateRow('popularRow', 8, 1);
+  populateRow('continueRow', 6);
+  populateRow('romanceRow', 5);
+
+  // Browse grid
+  const grid = document.getElementById('browseGrid');
+  for (let i = 0; i < 24; i++) {
+    const t = animeTitles[i % animeTitles.length];
+    const addon = [' (Season 1)', ' (Movie)', ' (Special)', ''][i % 4];
+    grid.innerHTML += `<div class="card">
+      <div class="card-img" style="background:${['#2a2a3e','#1a1a2e','#2e1a2e','#1a2e1a'][i%4]};font-size:24px">🎬</div>
+      <div class="card-footer">${t}${addon}</div>
+    </div>`;
+  }
+
+  // Search grid
+  const sg = document.getElementById('searchGrid');
+  for (let i = 0; i < 12; i++) {
+    const t = animeTitles[(i + 3) % animeTitles.length];
+    sg.innerHTML += `<div class="card">
+      <div class="card-img" style="background:${['#2a2a3e','#1a1a2e','#2e1a2e','#1a2e1a'][i%4]};font-size:24px">🎬</div>
+      <div class="card-footer">${t}</div>
+    </div>`;
+  }
+
+  // Episode list
+  const epList = document.getElementById('episodeList');
+  episodes.forEach((ep, i) => {
+    epList.innerHTML += `<div class="episode-item">
+      <div class="episode-thumb"><span>Ep ${i+1}</span></div>
+      <div class="episode-info">
+        <div class="episode-title">${i+1}. ${ep.title}</div>
+        <div class="episode-meta">${ep.meta}</div>
+        <div class="episode-desc">${ep.desc}</div>
+      </div>
+    </div>`;
+  });
+
+  // Tracked list
+  const tl = document.getElementById('trackedList');
+  watchlist.forEach((w, i) => {
+    tl.innerHTML += `<div class="list-card${w.active ? ' active' : ''}">
+      <div class="list-card-thumb" style="background:${['#2a2a3e','#1a1a2e','#2e1a2e','#1a2e1a','#2e2a1a'][i]};display:flex;align-items:center;justify-content:center;color:#555;font-size:10px">🎬</div>
+      <div class="list-card-info">
+        <div class="list-card-title">${w.title}</div>
+        <div class="list-card-sub">${w.sub}</div>
+      </div>
+    </div>`;
+  });
+
+  // Progress list
+  const pl = document.getElementById('progressList');
+  progressItems.forEach((item) => {
+    pl.innerHTML += `<div class="progress-item">
+      <div class="progress-thumb" style="background:#2a2a3e;display:flex;align-items:center;justify-content:center;color:#555;font-size:10px">🎬</div>
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:14px">${item.title}</div>
+        <div style="color:#888;font-size:12px;margin-top:2px">${item.sub}</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${item.pct}%"></div></div>
+      </div>
+    </div>`;
+  });
+
+  // ── Navbar scroll ──
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  // ── Search toggle ──
+  function toggleSearch() {
+    const input = document.getElementById('navSearch');
+    input.classList.toggle('open');
+    if (input.classList.contains('open')) input.focus();
+  }
+  function doSearch(val) {
+    if (val.trim()) {
+      switchView('search');
+      document.getElementById('searchInput').value = val;
+    }
+  }
+
+  // ── View switching ──
+  function switchView(view) {
+    document.querySelectorAll('[id^="view-"]').forEach(v => v.style.display = 'none');
+    const views = { browse: 'view-browse', search: 'view-search', player: 'view-player', mylist: 'view-mylist' };
+    const el = document.getElementById(views[view]);
+    if (el) el.style.display = 'block';
+    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+    const idx = { browse: 0, player: 1, mylist: 2 }[view];
+    if (idx !== undefined) document.querySelectorAll('.nav-links a')[idx].classList.add('active');
+    window.scrollTo({ top: 0 });
+  }
+</script>
+</body>
+</html>

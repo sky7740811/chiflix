@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player Prototype</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #141414; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: sans-serif; }
+
+  .player {
+    width: 960px; max-width: 95vw;
+    background: #000;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .player-video {
+    aspect-ratio: 16 / 9;
+    background: #000;
+    position: relative;
+  }
+
+  /* ── Top back arrow ── */
+  .top-bar {
+    position: absolute; top: 0; left: 0; right: 0;
+    display: flex; align-items: center;
+    padding: 20px 24px;
+    background: linear-gradient(180deg, rgba(0,0,0,.7) 0%, transparent 100%);
+    z-index: 2;
+  }
+  .top-bar svg { display: block; cursor: pointer; }
+
+  /* ── Bottom area ── */
+  .bottom-area {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 32px 24px 16px;
+    background: linear-gradient(0deg, rgba(0,0,0,.85) 0%, transparent 100%);
+    z-index: 2;
+  }
+
+  /* ── Timeline ── */
+  .timeline-row {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 12px;
+  }
+  .timeline-track {
+    flex: 1; position: relative; height: 20px;
+    display: flex; align-items: center; cursor: pointer;
+  }
+  .timeline-bg {
+    position: absolute; left: 0; right: 0; height: 3px;
+    background: rgba(255,255,255,.25); border-radius: 2px;
+  }
+  .timeline-fill {
+    position: absolute; left: 0; height: 3px;
+    width: 65%;
+    background: #e50914; border-radius: 2px;
+  }
+  .timeline-thumb {
+    position: absolute; top: 50%; left: 65%;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: #e50914;
+    transform: translate(-50%, -50%);
+  }
+  .timeline-time {
+    font-size: 12px; color: #bbb;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* ── Controls ── */
+  .controls-row {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .controls-left {
+    display: flex; align-items: center; gap: 8px;
+    flex-shrink: 0;
+  }
+  .controls-center {
+    flex: 1; text-align: center;
+    font-size: 14px; color: #fff;
+    font-weight: 400;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .controls-right {
+    display: flex; align-items: center; gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .ctrl-btn {
+    background: none; border: none; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 4px; opacity: .85; transition: opacity .15s;
+  }
+  .ctrl-btn:hover { opacity: 1; }
+  .ctrl-btn svg { display: block; }
+</style>
+</head>
+<body>
+
+<div class="player">
+  <div class="player-video">
+
+    <!-- Top: back arrow only -->
+    <div class="top-bar">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </div>
+
+    <!-- Bottom area -->
+    <div class="bottom-area">
+
+      <!-- Timeline -->
+      <div class="timeline-row">
+        <div class="timeline-track">
+          <div class="timeline-bg"></div>
+          <div class="timeline-fill"></div>
+          <div class="timeline-thumb"></div>
+        </div>
+        <span class="timeline-time">24:01</span>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls-row">
+        <!-- Left group -->
+        <div class="controls-left">
+          <!-- Play -->
+          <button class="ctrl-btn">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><polygon points="7,4 19,12 7,20"/></svg>
+          </button>
+          <!-- Rewind 10 -->
+          <button class="ctrl-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="1 4 1 10 7 10"/>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+              <text x="13" y="17" font-size="8" fill="#fff" stroke="none" font-weight="700">10</text>
+            </svg>
+          </button>
+          <!-- Forward 10 -->
+          <button class="ctrl-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"/>
+              <path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/>
+              <text x="7" y="17" font-size="8" fill="#fff" stroke="none" font-weight="700">10</text>
+            </svg>
+          </button>
+          <!-- Volume -->
+          <button class="ctrl-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Center: title -->
+        <div class="controls-center">닥터 스톤 1화 스톤 월드</div>
+
+        <!-- Right group -->
+        <div class="controls-right">
+          <!-- Next Ep -->
+          <button class="ctrl-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="6 4 18 12 6 20"/>
+              <line x1="18" y1="4" x2="18" y2="20"/>
+            </svg>
+          </button>
+          <!-- PIP -->
+          <button class="ctrl-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="4" width="20" height="16" rx="2"/>
+              <rect x="12" y="10" width="8" height="6" rx="1" fill="rgba(255,255,255,.2)"/>
+            </svg>
+          </button>
+          <!-- Subtitles -->
+          <button class="ctrl-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="4" width="20" height="16" rx="3"/>
+              <line x1="6" y1="10" x2="10" y2="10"/>
+              <line x1="6" y1="14" x2="14" y2="14"/>
+            </svg>
+          </button>
+          <!-- Speed -->
+          <button class="ctrl-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </button>
+          <!-- Fullscreen -->
+          <button class="ctrl-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 3 21 3 21 9"/>
+              <polyline points="9 21 3 21 3 15"/>
+              <line x1="21" y1="3" x2="14" y2="10"/>
+              <line x1="3" y1="21" x2="10" y2="14"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,11 @@
+2026-06-18,Création du projet Chiflix2 (v2) avec architecture React+FastAPI,backend/
+2026-06-18,API backend FastAPI avec endpoints scraper/progress_manager,backend/server.py
+2026-06-18,Fonctions API wrapper pour scraper (search, episodes, stream, download),backend/scraper_api.py
+2026-06-18,Composants React: Sidebar, SearchView, PlayerView, PlaylistView,frontend/src/components/
+2026-06-18,Types TypeScript et couche API client,frontend/src/api/
+2026-06-18,Thème Netflix dark mode CSS,frontend/src/App.css
+2026-06-18,Configuration Vite avec proxy backend,frontend/vite.config.ts
+2026-06-18,Script de démarrage combiné,start.bat
+2026-06-18,Redesign Netflix-style: navbar, hero, rows, player, mylist,frontend/src/
+2026-06-18,Composant HomeView avec hero billboard et rows de contenu,frontend/src/components/HomeView.tsx
+2026-06-18,Suppression Sidebar au profit de la top navbar,frontend/src/App.tsx

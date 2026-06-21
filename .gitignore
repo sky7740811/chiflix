@@ -1,0 +1,6 @@
+node_modules/
+dist/
+userdata/*.json
+__pycache__/
+*.pyc
+.env
