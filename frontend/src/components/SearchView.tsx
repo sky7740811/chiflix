@@ -35,9 +35,14 @@ export default function SearchView({ initialQuery = '', onPlayEpisode }: SearchV
   const [loadingEps, setLoadingEps] = useState(false);
   const [status, setStatus] = useState('');
 
-  /* Auto-load first series episodes if cached results exist */
+  /* Check for pending navbar search on mount */
   useEffect(() => {
-    if (results.length > 0 && !selectedSeries && !initialQuery) {
+    const navQ = (() => { try { return localStorage.getItem('chiflix_nav_search'); } catch { return null; } })();
+    if (navQ) {
+      try { localStorage.removeItem('chiflix_nav_search'); } catch {}
+      setQuery(navQ);
+      handleSearch(navQ);
+    } else if (results.length > 0 && !initialQuery) {
       setStatus(`Loaded ${results.length} results from cache`);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
