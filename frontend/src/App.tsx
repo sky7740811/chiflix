@@ -28,9 +28,9 @@ function saveState(path: string, ctx: PlayContext | null) {
 }
 
 const NAV_ITEMS = [
-  { path: '/', label: 'Home' },
-  { path: '/search', label: 'Search' },
-  { path: '/player', label: 'Player' },
+  { path: '/', label: '홈' },
+  { path: '/search', label: '검색' },
+  { path: '/player', label: '플레이어' },
   { path: '/mylist', label: 'My List' },
 ];
 

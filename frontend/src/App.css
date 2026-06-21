@@ -93,7 +93,7 @@ body {
 .hero-badge {
   display: inline-block; background: rgba(229,9,20,.9);
   padding: 3px 12px; border-radius: 3px;
-  font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  font-size: 12px; font-weight: 500; letter-spacing: 1px;
   margin-bottom: 16px;
 }
 .hero-title {
@@ -111,14 +111,14 @@ body {
 .btn-primary {
   background: var(--text); color: #000; border: none;
   padding: 10px 32px; border-radius: 4px;
-  font-size: 16px; font-weight: 700; cursor: pointer;
+  font-size: 16px; font-weight: 500; cursor: pointer;
   display: flex; align-items: center; gap: 10px;
 }
 .btn-primary:hover { opacity: .85; }
 .btn-secondary {
   background: rgba(109,109,110,.7); color: var(--text); border: none;
   padding: 10px 28px; border-radius: 4px;
-  font-size: 15px; font-weight: 600; cursor: pointer;
+  font-size: 15px; font-weight: 400; cursor: pointer;
   display: flex; align-items: center; gap: 10px;
 }
 .btn-secondary:hover { background: rgba(109,109,110,.4); }
@@ -150,7 +150,7 @@ body {
 
 /* ── Search ── */
 .search-header { padding: 30px 60px 0; }
-.search-header h1 { font-size: 28px; font-weight: 700; }
+.search-header h1 { font-size: 28px; font-weight: 500; }
 .search-input-wrap {
   margin-top: 16px; margin-bottom: 28px; background: var(--bg-input); border-radius: 6px;
   display: flex; align-items: center; padding: 0 16px;
@@ -192,7 +192,7 @@ body {
 }
 .card-badge {
   position: absolute; top: 8px; left: 0;
-  background: var(--accent); font-size: 10px; font-weight: 700;
+  background: var(--accent); font-size: 10px; font-weight: 500;
   padding: 2px 8px; border-radius: 0 3px 3px 0;
 }
 
@@ -202,10 +202,10 @@ body {
   display: flex; justify-content: space-between; align-items: flex-start;
   margin-bottom: 16px; gap: 16px; flex-wrap: wrap;
 }
-.player-top-title { font-size: 22px; font-weight: 700; }
+.player-top-title { font-size: 22px; font-weight: 500; }
 .player-top-sub { color: var(--text-muted); font-size: 13px; margin-top: 2px; }
 .player-top-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-.player-top-actions .match { color: #46d369; font-size: 13px; font-weight: 600; }
+.player-top-actions .match { color: #46d369; font-size: 13px; font-weight: 400; }
 
 /* ── Player: fixed-height wrapper ── */
 .player-wrapper { position: relative; background: #000; cursor: default; width: 100%; height: 85vh; }
@@ -319,7 +319,7 @@ body {
   position: absolute; top: 56px; right: 24px;
   background: #e50914; color: #fff;
   padding: 4px 12px; border-radius: 4px;
-  font-size: 12px; font-weight: 600;
+  font-size: 12px; font-weight: 400;
   z-index: 3;
 }
 
@@ -340,7 +340,7 @@ body {
   to { opacity: 1; transform: translateX(-50%) scale(1); }
 }
 .vol-popup-text {
-  font-size: 26px; font-weight: 700; color: #fff;
+  font-size: 26px; font-weight: 500; color: #fff;
   letter-spacing: 1px;
 }
 
@@ -376,7 +376,7 @@ body {
 .nf-ep-header {
   display: flex; justify-content: space-between; align-items: center;
   padding: 16px 20px; border-bottom: 1px solid #333;
-  font-size: 15px; font-weight: 600; color: #fff;
+  font-size: 15px; font-weight: 400; color: #fff;
 }
 .nf-ep-header button { font-size: 16px; color: #999; }
 .nf-ep-list { flex: 1; overflow-y: auto; padding: 8px 0; }
@@ -390,7 +390,7 @@ body {
 .nf-ep-num {
   width: 24px; height: 24px; border-radius: 50%;
   background: #333; display: flex; align-items: center;
-  justify-content: center; font-size: 11px; font-weight: 600;
+  justify-content: center; font-size: 11px; font-weight: 400;
   flex-shrink: 0;
 }
 .nf-ep-item.active .nf-ep-num { background: #e50914; }
@@ -399,7 +399,7 @@ body {
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .nf-ep-now {
-  font-size: 10px; font-weight: 700; color: #e50914;
+  font-size: 10px; font-weight: 500; color: #e50914;
   letter-spacing: 1px; flex-shrink: 0;
 }
 
@@ -408,7 +408,7 @@ body {
   display: flex; justify-content: space-between; align-items: center;
   margin: 24px 0 12px;
 }
-.episodes-header h2 { font-size: 20px; font-weight: 700; }
+.episodes-header h2 { font-size: 20px; font-weight: 500; }
 .episode-item {
   display: flex; gap: 16px; padding: 12px; cursor: pointer;
   transition: background .2s; border-radius: 4px;
@@ -422,7 +422,7 @@ body {
   color: #444; font-size: 12px;
 }
 .episode-info { flex: 1; }
-.episode-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+.episode-title { font-size: 15px; font-weight: 400; margin-bottom: 4px; }
 .episode-meta { font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
 .episode-desc { font-size: 13px; color: var(--text-muted); line-height: 1.4; }
 
@@ -430,7 +430,7 @@ body {
 .mylist-header {
   padding: 30px 60px 0;
 }
-.mylist-header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+.mylist-header h1 { font-size: 28px; font-weight: 500; margin-bottom: 8px; }
 .mylist-header p { color: #777; font-size: 14px; margin-bottom: 24px; }
 
 .mylist-layout { display: flex; gap: 30px; padding: 24px 60px 40px; }
@@ -438,7 +438,7 @@ body {
 .mylist-main { flex: 1; }
 .list-section-label {
   font-size: 12px; color: #888; text-transform: uppercase;
-  font-weight: 600; letter-spacing: 1px; margin-bottom: 12px;
+  font-weight: 400; letter-spacing: 1px; margin-bottom: 12px;
 }
 .list-card {
   display: flex; gap: 12px; padding: 10px; border-radius: 6px;
@@ -452,7 +452,7 @@ body {
   color: #555; font-size: 10px;
 }
 .list-card-info { flex: 1; min-width: 0; }
-.list-card-title { font-size: 14px; font-weight: 600; }
+.list-card-title { font-size: 14px; font-weight: 400; }
 .list-card-sub { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
 
 .progress-item {
