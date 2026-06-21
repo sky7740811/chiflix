@@ -467,16 +467,19 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
             position: 'absolute',
             top: '50%',
             transform: 'translateY(-50%)',
-            left: skipPopup.side === 'left' ? '40px' : 'auto',
-            right: skipPopup.side === 'right' ? '40px' : 'auto',
+            left: skipPopup.side === 'left' ? '60px' : 'auto',
+            right: skipPopup.side === 'right' ? '60px' : 'auto',
             zIndex: 10,
             pointerEvents: 'none',
-            filter: 'drop-shadow(0 0 12px rgba(0,0,0,.6))',
+            opacity: 0.5,
+            filter: 'drop-shadow(0 0 16px rgba(0,0,0,.8))',
           }}>
-            {Math.abs(skipPopup.sec) === 90 ? <SForward90 /> :
-             Math.abs(skipPopup.sec) === 30 ? <SForward30 /> :
-             Math.abs(skipPopup.sec) === 10 && skipPopup.side === 'right' ? <SForward10 /> :
-             <SRewind10 />}
+            <div style={{ transform: 'scale(2)', transformOrigin: 'center center' }}>
+              {Math.abs(skipPopup.sec) === 90 ? <SForward90 /> :
+               Math.abs(skipPopup.sec) === 30 ? <SForward30 /> :
+               Math.abs(skipPopup.sec) === 10 && skipPopup.side === 'right' ? <SForward10 /> :
+               <SRewind10 />}
+            </div>
           </div>
         )}
 

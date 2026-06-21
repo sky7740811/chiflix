@@ -327,8 +327,8 @@ body {
   position: absolute; top: 80px; left: 50%; transform: translateX(-50%);
   background: rgba(0,0,0,.75);
   backdrop-filter: blur(4px);
-  padding: 12px 24px;
-  border-radius: 8px;
+  padding: 16px 32px;
+  border-radius: 10px;
   z-index: 10;
   pointer-events: none;
   display: flex; align-items: center; gap: 12px;
@@ -339,7 +339,7 @@ body {
   to { opacity: 1; transform: translateX(-50%) scale(1); }
 }
 .vol-popup-text {
-  font-size: 20px; font-weight: 700; color: #fff;
+  font-size: 26px; font-weight: 700; color: #fff;
   letter-spacing: 1px;
 }
 
@@ -347,14 +347,14 @@ body {
 .nf-vol-wrap { position: relative; display: inline-flex; align-items: center; }
 .nf-vol-popup {
   position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
-  background: rgba(30,30,30,.95); border-radius: 6px;
-  padding: 10px 6px; margin-bottom: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,.5);
+  background: rgba(30,30,30,.95); border-radius: 8px;
+  padding: 16px 10px; margin-bottom: 10px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.6);
   z-index: 10;
 }
 .nf-vol-popup input[type=range] {
   writing-mode: vertical-lr; direction: rtl;
-  width: 4px; height: 80px;
+  width: 8px; height: 120px;
   accent-color: #e50914; cursor: pointer;
   background: transparent;
 }
