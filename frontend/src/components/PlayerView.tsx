@@ -46,10 +46,17 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
 
   const addLog = useCallback((msg: string) => setLogs((p) => [...p.slice(-20), msg]), []);
 
+  const bumpTimerRef = useRef(0);
+
   const bumpControls = useCallback(() => {
+    const now = Date.now();
+    if (now - bumpTimerRef.current < 200) return;
+    bumpTimerRef.current = now;
     setShowControls(true);
     if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-    if (playingRef.current) hideTimerRef.current = setTimeout(() => setShowControls(false), 3000);
+    if (playingRef.current) {
+      hideTimerRef.current = setTimeout(() => setShowControls(false), 3000);
+    }
   }, []);
 
   useEffect(() => {
@@ -119,7 +126,9 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
       /* Seek to saved progress */
       (async () => {
         try {
-          const t = await api.getProgress(animeTitle, currentEpNum);
+          let t = 0;
+          try { t = parseInt(localStorage.getItem('chiflix_progress_' + animeTitle + '_' + currentEpNum) || '0', 10); } catch {}
+          if (t <= 0) t = await api.getProgress(animeTitle, currentEpNum);
           if (t > 3000) {
             const check = setInterval(() => {
               if (videoRef.current && videoRef.current.readyState >= 1) {
@@ -165,22 +174,26 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
     return () => document.removeEventListener('fullscreenchange', fn);
   }, []);
 
-  /* Auto-save progress every 10s while playing */
+  /* Auto-save progress every 1s + sync time display */
   useEffect(() => {
     if (!playing || !animeTitle || !currentEpNum) return;
     const iv = setInterval(async () => {
       const t = timeRef.current;
       if (t <= 0) return;
       try { await api.saveProgress(animeTitle, currentEpNum, Math.round(t), hrefRef.current || undefined, imgSrc || undefined, duration > 0 ? duration : undefined); } catch {}
+      setCurrentTime(t);
     }, 1000);
-    return () => clearInterval(iv);
+    return () => { clearInterval(iv); };
   }, [playing, animeTitle, currentEpNum]);
 
   /* Save on pause */
   const doSaveProgress = useCallback(async () => {
     const t = timeRef.current;
     if (t <= 0 || !animeTitle || !currentEpNum) return;
-    try { await api.saveProgress(animeTitle, currentEpNum, Math.round(t), hrefRef.current || undefined, imgSrc || undefined, duration > 0 ? duration : undefined); } catch {}
+    try {
+      localStorage.setItem('chiflix_progress_' + animeTitle + '_' + currentEpNum, String(Math.round(t)));
+      await api.saveProgress(animeTitle, currentEpNum, Math.round(t), hrefRef.current || undefined, imgSrc || undefined, duration > 0 ? duration : undefined);
+    } catch {}
   }, [animeTitle, currentEpNum, imgSrc, duration]);
 
   useEffect(() => {
@@ -470,7 +483,7 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
         <video ref={videoRef} src={streamUrl || undefined} autoPlay
           onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
           onLoadedMetadata={() => { if (videoRef.current) setDuration(videoRef.current.duration * 1000); }}
-          onTimeUpdate={() => { if (videoRef.current) { const t = videoRef.current.currentTime * 1000; setCurrentTime(t); timeRef.current = t; } }}
+          onTimeUpdate={() => { if (videoRef.current) { const t = videoRef.current.currentTime * 1000; timeRef.current = t; } }}
         />
 
         {/* Volume change popup */}
