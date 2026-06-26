@@ -66,9 +66,9 @@ def search(req: SearchQuery):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/episodes")
-def episodes(href: str):
+def episodes(href: str, force: bool = False):
     try:
-        episodes = scraper_api.get_episode_list(href)
+        episodes = scraper_api.get_episode_list(href, force=force)
         return {"episodes": episodes}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

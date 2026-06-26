@@ -14,6 +14,7 @@ export interface EpisodeItem {
 export interface WatchlistItem {
   last_watched_episode: number;
   img_src: string | null;
+  is_favorited?: boolean;
   episodes: Record<string, { time_ms: number; total_ms?: number }>;
 }
 

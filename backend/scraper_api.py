@@ -17,12 +17,14 @@ def search_anime(query):
     results = scraper.run_search_phase(query)
     return results
 
-def get_episode_list(series_url):
+def get_episode_list(series_url, force=False):
     if not series_url.startswith("http"):
         series_url = f"https://ani.ohli24.com{series_url}" if series_url.startswith("/") else f"https://ani.ohli24.com/{series_url}"
-    cached = pm.get_cached_episodes(series_url)
-    if cached:
-        return cached
+    if not force:
+        cached = pm.get_cached_episodes(series_url)
+        if cached:
+            return cached
+    pm.clear_cached_episodes(series_url)
     episodes = scraper.fetch_episode_list(series_url)
     if episodes:
         pm.save_cached_episodes(series_url, episodes)

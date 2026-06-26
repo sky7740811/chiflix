@@ -306,10 +306,7 @@ body {
   width: 90px; height: 90px; border: 4px solid rgba(255,255,255,.8);
   border-radius: 50%; display: flex; align-items: center;
   justify-content: center; transition: transform .2s, background .2s;
-  background: rgba(0,0,0,.4);
-}
-.player-center-btn:hover .play-circle-sm {
-  transform: scale(1.1);
+
   background: rgba(229,9,14,.8); border-color: #e50914;
 }
 .play-circle-sm svg { width: 42px; height: 42px; }
@@ -517,4 +514,24 @@ body {
   .chip-row { padding: 16px 20px; }
   .tab-bar { padding: 16px 20px 0; }
   .status-text { padding: 10px 20px; }
+}
+
+
+/* ── Buffering overlay ── */
+.buffering-overlay {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 8; pointer-events: none;
+  opacity: 0.5;
+}
+.buffering-spinner {
+  width: 56px; height: 56px;
+  border: 4px solid rgba(255,255,255,.25);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: chiflix-spin .8s linear infinite;
+}
+@keyframes chiflix-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

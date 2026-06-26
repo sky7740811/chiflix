@@ -39,6 +39,8 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
   const [currentEpNum, setCurrentEpNum] = useState(epNum);
   const [isDownloaded, setIsDownloaded] = useState(false);
   const [imgSrc, setImgSrc] = useState<string | null>(null);
+  const [buffering, setBuffering] = useState(false);
+  const skipTargetRef = useRef(0);
   const [volPopup, setVolPopup] = useState<number | null>(null);
   const [skipPopup, setSkipPopup] = useState<{ sec: number; side: 'left' | 'right' } | null>(null);
   const volPopupTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -245,7 +247,11 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
     const dur = videoRef.current.duration || 0;
     if (skipAccumRef.current === 0) skipBaseRef.current = videoRef.current.currentTime;
     skipAccumRef.current += sec;
-    videoRef.current.currentTime = Math.max(0, Math.min(skipBaseRef.current + skipAccumRef.current, dur));
+    const target = Math.max(0, Math.min(skipBaseRef.current + skipAccumRef.current, dur));
+    videoRef.current.currentTime = target;
+    skipTargetRef.current = target;
+    setCurrentTime(target * 1000);
+    if (videoRef.current.readyState < 2) setBuffering(true);
     const side = sec < 0 ? 'left' : 'right';
     setSkipPopup({ sec, side });
     if (skipPopupTimer.current) clearTimeout(skipPopupTimer.current);
@@ -483,7 +489,11 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
         <video ref={videoRef} src={streamUrl || undefined} autoPlay
           onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}
           onLoadedMetadata={() => { if (videoRef.current) setDuration(videoRef.current.duration * 1000); }}
-          onTimeUpdate={() => { if (videoRef.current) { const t = videoRef.current.currentTime * 1000; timeRef.current = t; } }}
+          onTimeUpdate={() => { if (videoRef.current) { const t = videoRef.current.currentTime * 1000; timeRef.current = t; setBuffering(false); } }}
+          onWaiting={() => setBuffering(true)}
+          onCanPlay={() => setBuffering(false)}
+          onSeeking={() => setBuffering(true)}
+          onSeeked={() => { if (videoRef.current && videoRef.current.readyState >= 2) setBuffering(false); }}
         />
 
         {/* Volume change popup */}
@@ -512,6 +522,13 @@ export default function PlayerView({ animeTitle, epNum, episodeHref, filePath, o
                Math.abs(skipPopup.sec) === 10 && skipPopup.side === 'right' ? <SForward10 /> :
                <SRewind10 />}
             </div>
+          </div>
+        )}
+
+        {/* Buffering spinner */}
+        {buffering && (
+          <div className="buffering-overlay">
+            <div className="buffering-spinner" />
           </div>
         )}
 

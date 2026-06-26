@@ -83,6 +83,12 @@ def save_cached_episodes(series_url, episodes):
     data["episodes"][series_url] = episodes
     save_web_cache(data)
 
+def clear_cached_episodes(series_url):
+    data = load_web_cache()
+    if "episodes" in data and series_url in data["episodes"]:
+        del data["episodes"][series_url]
+        save_web_cache(data)
+
 def add_to_watchlist(anime_title, img_src=None):
     data = load_progress()
     if "watchlist" not in data:

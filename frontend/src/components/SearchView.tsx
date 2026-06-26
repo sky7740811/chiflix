@@ -70,12 +70,12 @@ export default function SearchView({ initialQuery = '', onPlayEpisode }: SearchV
     }
   }, [query]);
 
-  const handleSelectSeries = useCallback(async (item: SearchResult) => {
+  const handleSelectSeries = useCallback(async (item: SearchResult, forceRefresh?: boolean) => {
     setSelectedSeries(item);
     setLoadingEps(true);
-    setStatus(`Loading episodes...`);
+    setStatus(`에피소드 로딩 중...`);
       try {
-        const eps = await api.getEpisodes(item.href);
+        const eps = await api.getEpisodes(item.href, forceRefresh);
         setEpisodes(eps);
         setStatus(`${eps.length}개 에피소드 불러옴`);
         try {
@@ -143,6 +143,8 @@ export default function SearchView({ initialQuery = '', onPlayEpisode }: SearchV
           <div className="tab-bar" style={{ padding: '16px 0', marginBottom: '16px' }}>
             <button className="tab-item" onClick={() => setSelectedSeries(null)}>← 결과로 돌아가기</button>
             <button className="tab-item active">{selectedSeries.text}</button>
+            <button className="tab-item" style={{ marginLeft: 'auto', color: '#e50914', fontWeight: 400 }}
+              onClick={() => handleSelectSeries(selectedSeries, true)}>↻ 새로고침</button>
           </div>
           {loadingEps && <div className="empty-state" style={{ padding: '20px' }}>Loading episodes...</div>}
           {!loadingEps && episodes.length === 0 && (

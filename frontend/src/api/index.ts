@@ -2,6 +2,21 @@ import type { SearchResult, EpisodeItem, WatchlistItem, LocalFile, DownloadProgr
 
 const API_BASE = '/api';
 
+const WL_KEY = 'chiflix_watchlist';
+
+function getLocalWL(): Record<string, WatchlistItem> {
+  try { return JSON.parse(localStorage.getItem(WL_KEY) || '{}'); } catch { return {}; }
+}
+function setLocalWL(data: Record<string, WatchlistItem>) {
+  try { localStorage.setItem(WL_KEY, JSON.stringify(data)); } catch {}
+}
+function getLocalTime(title: string, ep: number): number {
+  try { return parseInt(localStorage.getItem('chiflix_progress_' + title + '_' + ep) || '0', 10); } catch { return 0; }
+}
+function setLocalTime(title: string, ep: number, ms: number) {
+  try { localStorage.setItem('chiflix_progress_' + title + '_' + ep, String(ms)); } catch {}
+}
+
 async function fetchJSON<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${url}`, {
     headers: { 'Content-Type': 'application/json', ...options?.headers },
@@ -22,8 +37,8 @@ export async function searchAnime(query: string): Promise<SearchResult[]> {
   return data.results;
 }
 
-export async function getEpisodes(href: string): Promise<EpisodeItem[]> {
-  const data = await fetchJSON<{ episodes: EpisodeItem[] }>(`/episodes?href=${encodeURIComponent(href)}`, { method: 'POST' });
+export async function getEpisodes(href: string, force?: boolean): Promise<EpisodeItem[]> {
+  const data = await fetchJSON<{ episodes: EpisodeItem[] }>(`/episodes?href=${encodeURIComponent(href)}&force=${force ? 'true' : 'false'}`, { method: 'POST' });
   return data.episodes;
 }
 
@@ -41,36 +56,76 @@ export async function getLocalFiles(): Promise<Record<string, LocalFile[]>> {
 }
 
 export async function getWatchlist(): Promise<Record<string, WatchlistItem>> {
-  const data = await fetchJSON<{ watchlist: Record<string, WatchlistItem> }>('/watchlist');
-  return data.watchlist;
+  try {
+    const data = await fetchJSON<{ watchlist: Record<string, WatchlistItem> }>('/watchlist');
+    setLocalWL(data.watchlist);
+    return data.watchlist;
+  } catch {
+    return getLocalWL();
+  }
 }
 
 export async function addToWatchlist(animeTitle: string, imgSrc?: string): Promise<void> {
-  await fetchJSON('/watchlist/add', {
-    method: 'POST',
-    body: JSON.stringify({ anime_title: animeTitle, img_src: imgSrc || null }),
-  });
+  const wl = getLocalWL();
+  wl[animeTitle] = wl[animeTitle] || { last_watched_episode: 0, img_src: null, episodes: {} };
+  wl[animeTitle].is_favorited = true;
+  if (imgSrc) wl[animeTitle].img_src = imgSrc;
+  setLocalWL(wl);
+  try {
+    await fetchJSON('/watchlist/add', {
+      method: 'POST',
+      body: JSON.stringify({ anime_title: animeTitle, img_src: imgSrc || null }),
+    });
+  } catch {}
 }
 
 export async function removeFromWatchlist(animeTitle: string): Promise<void> {
-  await fetchJSON(`/watchlist/remove?anime_title=${encodeURIComponent(animeTitle)}`, { method: 'POST' });
+  const wl = getLocalWL();
+  if (wl[animeTitle]) wl[animeTitle].is_favorited = false;
+  setLocalWL(wl);
+  try {
+    await fetchJSON(`/watchlist/remove?anime_title=${encodeURIComponent(animeTitle)}`, { method: 'POST' });
+  } catch {}
 }
 
 export async function getProgress(animeTitle: string, epNum: number): Promise<number> {
-  const data = await fetchJSON<{ time_ms: number }>(`/progress?anime_title=${encodeURIComponent(animeTitle)}&ep_num=${epNum}`);
-  return data.time_ms;
+  const local = getLocalTime(animeTitle, epNum);
+  try {
+    const data = await fetchJSON<{ time_ms: number }>(`/progress?anime_title=${encodeURIComponent(animeTitle)}&ep_num=${epNum}`);
+    if (data.time_ms > 0) setLocalTime(animeTitle, epNum, data.time_ms);
+    return data.time_ms || local;
+  } catch {
+    return local;
+  }
 }
 
 export async function saveProgress(animeTitle: string, epNum: number, timeMs: number, episodeHref?: string, imgSrc?: string, totalMs?: number): Promise<void> {
-  await fetchJSON('/progress', {
-    method: 'POST',
-    body: JSON.stringify({ anime_title: animeTitle, ep_num: epNum, time_ms: Math.round(timeMs), episode_href: episodeHref || null, img_src: imgSrc || null, total_ms: totalMs || null }),
-  });
+  setLocalTime(animeTitle, epNum, Math.round(timeMs));
+  const wl = getLocalWL();
+  if (!wl[animeTitle]) {
+    wl[animeTitle] = { last_watched_episode: 0, img_src: null, episodes: {} };
+  }
+  wl[animeTitle].episodes = wl[animeTitle].episodes || {};
+  wl[animeTitle].episodes[String(epNum)] = { time_ms: Math.round(timeMs), total_ms: totalMs || undefined };
+  wl[animeTitle].last_watched_episode = Math.max(wl[animeTitle].last_watched_episode || 0, epNum);
+  wl[animeTitle].is_favorited = true;
+  setLocalWL(wl);
+  try {
+    await fetchJSON('/progress', {
+      method: 'POST',
+      body: JSON.stringify({ anime_title: animeTitle, ep_num: epNum, time_ms: Math.round(timeMs), episode_href: episodeHref || null, img_src: imgSrc || null, total_ms: totalMs || null }),
+    });
+  } catch {}
 }
 
 export async function isFavorited(animeTitle: string): Promise<boolean> {
-  const data = await fetchJSON<{ favorited: boolean }>(`/favorited?anime_title=${encodeURIComponent(animeTitle)}`);
-  return data.favorited;
+  try {
+    const data = await fetchJSON<{ favorited: boolean }>(`/favorited?anime_title=${encodeURIComponent(animeTitle)}`);
+    return data.favorited;
+  } catch {
+    const wl = getLocalWL();
+    return !!(wl[animeTitle] && wl[animeTitle].is_favorited);
+  }
 }
 
 export async function startDownload(animeTitle: string, epNum: number, targetSlug: string): Promise<string> {

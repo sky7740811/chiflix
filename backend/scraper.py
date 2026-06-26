@@ -196,6 +196,11 @@ def fetch_episode_list(series_url):
             page.goto(series_url, timeout=20000)
             page.wait_for_timeout(2000)
             
+            # Scroll to bottom to trigger lazy loading
+            for _ in range(5):
+                page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                page.wait_for_timeout(800)
+            
             raw_links = page.evaluate(
                 "() => Array.from(document.querySelectorAll('a')).filter(e => e.getAttribute('href') && e.getAttribute('href').includes('/e/')).map(e => ({ href: e.getAttribute('href'), text: e.innerText }))"
             )
